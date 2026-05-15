@@ -92,7 +92,15 @@ export const getAllBatches = asyncHandler(async (req, res) => {
     throw new ApiError(400, "User not logged in.");
   }
 
-  const allBatches = await Batch.find();
+  const allBatches = await Batch.find().populate({
+    path: "teacher",
+    select: "education",
+    populate: {
+      path: "userId",
+      model: "User",
+      select: "name email", // whatever fields are on User
+    },
+  });
 
   return res.status(200).json(new ApiResponse(200, allBatches, "All batches."));
 });
@@ -108,15 +116,25 @@ export const getBatchById = asyncHandler(async (req, res) => {
 
   const { batch_id } = req.params;
 
-  const batch = await Batch.findById(batch_id).populate({
-    path: "students",
-    select: "userId studentType board standard",
-    populate: {
-      path: "userId",
-      model: "User",
-      select: "name email",
-    },
-  });
+  const batch = await Batch.findById(batch_id)
+    .populate({
+      path: "teacher",
+      select: "education",
+      populate: {
+        path: "userId",
+        model: "User",
+        select: "name email", // whatever fields are on User
+      },
+    })
+    .populate({
+      path: "students",
+      select: "userId studentType board standard",
+      populate: {
+        path: "userId",
+        model: "User",
+        select: "name email",
+      },
+    });
 
   if (!batch) {
     throw new ApiError(400, "Batch not found");

@@ -217,6 +217,8 @@ export const createUser = asyncHandler(async (req, res) => {
   const otp = createdUser.generateOTP();
   await createdUser.save({ validateBeforeSave: false });
 
+  logger.info({ otp }, "OTP->");
+
   await sendMail({
     email: createdUser.email,
     subject: "Verify your account",
