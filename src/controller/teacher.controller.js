@@ -172,3 +172,14 @@ export const getTeacherById = asyncHandler(async (req, res) => {
 
   return res.status(200).json(new ApiResponse(200, teacher, "Teacher"));
 });
+
+// export const getTeacherBatches = asyncHandler(async (req, res) => {});
+
+// export const getMyStudents = asyncHandler(async (req, res) => {
+//   const user = req.user;
+
+//   if (!user) {
+//     throw new ApiError(404, "User not found.");
+//   }
+
+// });
