@@ -4,6 +4,7 @@ import { logInAuth } from "../middleware/logInAuth.middleware.js";
 import {
   assignTeacherToBatch,
   getMyBatches,
+  getTeacherById,
   setupTeacherProfile,
   updateTeacher,
 } from "../controller/teacher.controller.js";
@@ -33,7 +34,12 @@ teacherRouter.get(
 // teacherRouter.get("/my-students", logInAuth, authorizeRoles(available_user_roles.TEACHER), getMyStudents);
 
 // // admin-only teacher management
-// teacherRouter.get("/:teacher_id", logInAuth, authorizeRoles(available_user_roles.ADMIN, available_user_roles.SUPER_ADMIN), getTeacherById);
+teacherRouter.get(
+  "/:teacher_id",
+  logInAuth,
+  authorizeRoles(available_user_roles.ADMIN, available_user_roles.SUPER_ADMIN),
+  getTeacherById,
+);
 teacherRouter.patch(
   "/:teacher_id/assign-batch",
   logInAuth,

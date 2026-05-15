@@ -152,3 +152,23 @@ export const assignTeacherToBatch = asyncHandler(async (req, res) => {
     .status(200)
     .json(new ApiResponse(200, teacher, "Teacher enrolled in batch."));
 });
+
+export const getTeacherById = asyncHandler(async (req, res) => {
+  const user = req.user;
+
+  if (!user) {
+    throw new ApiError(404, "User not found.");
+  }
+
+  const { teacher_id } = req.params;
+
+  const teacher = await Teacher.findById(teacher_id)
+    .populate("userId", "name email")
+    .populate("enrolledBatches", "name");
+
+  if (!teacher) {
+    throw new ApiError(404, "Tacher not found");
+  }
+
+  return res.status(200).json(new ApiResponse(200, teacher, "Teacher"));
+});
