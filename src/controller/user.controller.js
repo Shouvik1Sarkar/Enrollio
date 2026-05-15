@@ -253,8 +253,11 @@ export const getUserById = asyncHandler(async (req, res) => {
     throw new ApiError(401, "User not found");
   }
 
-  if (myUser.role === available_user_roles.STUDENT) {
-    throw new ApiError(403, "Students cannot update accounts.");
+  if (
+    myUser.role === available_user_roles.STUDENT ||
+    myUser.role === available_user_roles.TEACHER
+  ) {
+    throw new ApiError(403, "Students and teachers cannot update accounts.");
   }
 
   const { user_id } = req.params;

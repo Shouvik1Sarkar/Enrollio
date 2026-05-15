@@ -57,7 +57,7 @@ userRouter.patch(
 userRouter.get(
   "/:user_id",
   logInAuth,
-  authorizeRoles(admin, super_admin, teacher),
+  authorizeRoles(admin, super_admin),
   getUserById,
 );
 
