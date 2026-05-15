@@ -13,11 +13,16 @@ import { available_user_roles } from "../utils/constants.utils.js";
 
 const teacherRouter = Router();
 
+const admin = available_user_roles.ADMIN;
+const super_admin = available_user_roles.SUPER_ADMIN;
+const teacher = available_user_roles.TEACHER;
+const student = available_user_roles.STUDENT;
+
 teacherRouter.post("/setup/:userId", logInAuth, setupTeacherProfile);
 teacherRouter.post(
   "/update/:userId",
   logInAuth,
-  authorizeRoles(available_user_roles.SUPER_ADMIN, available_user_roles.ADMIN),
+  authorizeRoles(admin, super_admin),
   updateTeacher,
 );
 
@@ -28,7 +33,7 @@ teacherRouter.post(
 teacherRouter.get(
   "/my-batches",
   logInAuth,
-  authorizeRoles(available_user_roles.TEACHER),
+
   getMyBatches,
 );
 // teacherRouter.get(
@@ -42,13 +47,13 @@ teacherRouter.get(
 teacherRouter.get(
   "/:teacher_id",
   logInAuth,
-  authorizeRoles(available_user_roles.ADMIN, available_user_roles.SUPER_ADMIN),
+  // authorizeRoles(admin, super_admin),
   getTeacherById,
 );
 teacherRouter.patch(
   "/:teacher_id/assign-batch",
   logInAuth,
-  authorizeRoles(available_user_roles.ADMIN, available_user_roles.SUPER_ADMIN),
+  authorizeRoles(admin, super_admin),
   assignTeacherToBatch,
 );
 

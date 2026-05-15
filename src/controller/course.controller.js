@@ -13,8 +13,8 @@ export const createCourse = asyncHandler(async (req, res) => {
     throw new ApiError(400, "User not logged in.");
   }
 
-  if (myUser.role === available_user_roles.STUDENT) {
-    throw new ApiError(403, "Students cannot create courses");
+  if (myUser.role !== available_user_roles.SUPER_ADMIN) {
+    throw new ApiError(403, "only super admin can create courses");
   }
 
   const { courseType, subject, standard, stream, board, description, name } =
