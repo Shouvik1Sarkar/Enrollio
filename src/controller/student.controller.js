@@ -99,9 +99,11 @@ export const enrollStudentInBatch = asyncHandler(async (req, res) => {
   // }
 
   // check not already enrolled
+
   const isAlreadyEnrolled = student.enrolledBatches.some(
     (id) => id.toString() === batch._id.toString(),
   );
+
   if (isAlreadyEnrolled) {
     throw new ApiError(400, "Student is already enrolled in this batch");
   }
@@ -109,6 +111,7 @@ export const enrollStudentInBatch = asyncHandler(async (req, res) => {
   // update both sides cleanly
   await Student.findByIdAndUpdate(student_id, {
     $push: { enrolledBatches: batch._id },
+    $inc: { total_fees: batch.monthlyFees },
   });
 
   await Batch.findByIdAndUpdate(batch._id, { $push: { students: student_id } });

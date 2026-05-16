@@ -40,16 +40,21 @@ const studentSchema = new mongoose.Schema(
       default: null,
     },
 
-    // learningMode: {
-    //   type: String,
-    //   enum: ["batch", "online", "home_tuition"],
-    //   required: true,
-    // },
+    learningMode: {
+      type: String,
+      enum: ["batch", "online", "home_tuition"],
+      // required: true,
+    },
 
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
+    },
+
+    total_fees: {
+      type: Number,
+      default: 0,
     },
   },
   { timestamps: true },

@@ -68,7 +68,8 @@ const batchSchema = new mongoose.Schema(
     // ── FEES ─────────────────────────────────────
     monthlyFees: {
       type: Number,
-      required: true, // base fee for this batch per month
+      // required: true, // base fee for this batch per month
+      default: 0,
     },
 
     // ── STATUS ───────────────────────────────────
@@ -87,6 +88,12 @@ const batchSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
+
+    // fees: {
+    //   type: Number,
+    //   required: true, // admin sets this when creating the batch
+    //   default: 0,
+    // },
   },
   { timestamps: true },
 );

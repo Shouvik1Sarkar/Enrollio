@@ -67,6 +67,7 @@ export const createBatch = asyncHandler(async (req, res) => {
     monthlyFees,
     createdBy: req.user._id,
     serial,
+    monthlyFees: monthlyFees ?? undefined,
   });
 
   if (!batch) {

@@ -10,6 +10,8 @@ import {
   updateUser,
   updateUserRole,
 } from "../controller/user.controller.js";
+import { available_user_roles } from "../utils/constants.utils.js";
+import authorizeRoles from "../middleware/authorizeRoles.middleware.js";
 
 const userRouter = Router();
 
