@@ -45,6 +45,7 @@ studentRouter.patch(
   authorizeRoles(admin, super_admin, teacher),
   updateStudentProfile,
 );
+
 // // update board, standard, stream, studentType
 
 // studentRouter.delete("/:student_id", logInAuth, deleteStudent);

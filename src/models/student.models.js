@@ -3,11 +3,13 @@ import { boards_enum } from "../utils/constants.utils.js";
 
 const feeRecordSchema = new mongoose.Schema(
   {
-    batch: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Batch",
-      required: true,
-    },
+    // batch: [
+    //   {
+    //     type: mongoose.Schema.Types.ObjectId,
+    //     ref: "Batch",
+    //     required: true,
+    //   },
+    // ],
     amount: {
       type: Number,
       required: true,

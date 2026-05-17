@@ -7,6 +7,7 @@ import courseRouter from "./routes/course.routes.js";
 import batchRouter from "./routes/batch.routes.js";
 import studentRouter from "./routes/student.routes.js";
 import teacherRouter from "./routes/teacher.routes.js";
+import feesRouter from "./routes/fees.routes.js";
 
 const app = express();
 
@@ -38,5 +39,6 @@ app.use("/api/v1/course", courseRouter);
 app.use("/api/v1/batch", batchRouter);
 app.use("/api/v1/student", studentRouter);
 app.use("/api/v1/teacher", teacherRouter);
+app.use("/api/v1/fees", feesRouter);
 
 export default app;
