@@ -1,6 +1,48 @@
 import mongoose from "mongoose";
 import { boards_enum } from "../utils/constants.utils.js";
 
+const feeRecordSchema = new mongoose.Schema(
+  {
+    batch: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Batch",
+      required: true,
+    },
+    amount: {
+      type: Number,
+      required: true,
+    },
+    month: {
+      type: String, // "2026-05"
+      required: true,
+    },
+    dueDate: {
+      type: Date,
+      required: true,
+    },
+    status: {
+      type: String,
+      enum: ["paid", "pending", "overdue"],
+      default: "pending",
+    },
+    paidAt: {
+      type: Date,
+      default: null,
+    },
+    collectedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User", // admin who collected
+      default: null,
+    },
+    note: {
+      type: String,
+      default: null,
+      trim: true,
+    },
+  },
+  { _id: true }, // keep _id so you can update a specific record
+);
+
 const studentSchema = new mongoose.Schema(
   {
     userId: {
@@ -56,6 +98,8 @@ const studentSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+
+    feeHistory: [feeRecordSchema],
   },
   { timestamps: true },
 );
