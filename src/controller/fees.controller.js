@@ -205,7 +205,7 @@ export const getStudentBalance = asyncHandler(async (req, res) => {
       200,
 
       {
-        // total_fees: student.total_fees, // monthly obligation
+        total_fees: student.total_fees, // monthly obligation
         totalPaid, // sum of all paid records
         totalPending, // sum of all pending records
         // balance: totalPending, // what's still owed
