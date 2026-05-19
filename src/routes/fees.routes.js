@@ -4,7 +4,7 @@ import { logInAuth } from "../middleware/logInAuth.middleware.js";
 
 import { available_user_roles } from "../utils/constants.utils.js";
 import authorizeRoles from "../middleware/authorizeRoles.middleware.js";
-import { addFeeRecord } from "../controller/fees.controller.js";
+import { addFeeRecord, feeById } from "../controller/fees.controller.js";
 
 const feesRouter = Router();
 
@@ -18,6 +18,13 @@ feesRouter.post(
   logInAuth,
   authorizeRoles(admin, super_admin),
   addFeeRecord, // admin adds a pending fee for a month
+);
+
+feesRouter.get(
+  "/:student_id/fees/:fee_id",
+  logInAuth,
+  authorizeRoles(admin, super_admin),
+  feeById, // remove a wrong entry
 );
 
 export default feesRouter;

@@ -1,5 +1,6 @@
 import Student from "../models/student.models.js";
 import ApiError from "../utils/ApiError.utils.js";
+import ApiResponse from "../utils/ApiResponse.utils.js";
 import asyncHandler from "../utils/asyncHandler.utils.js";
 
 export const addFeeRecord = asyncHandler(async (req, res) => {
@@ -45,4 +46,25 @@ export const addFeeRecord = asyncHandler(async (req, res) => {
   return res
     .status(201)
     .json(new ApiResponse(201, student.feeHistory, "Fee records added."));
+});
+
+export const feeById = asyncHandler(async (req, res) => {
+  const user = req.user;
+  if (!user) {
+    throw new ApiError(403, "User not logged In.");
+  }
+
+  const { student_id, fee_id } = req.params;
+
+  const student = await Student.findById(student_id);
+  if (!student) {
+    throw new ApiError(400, "Student not found.");
+  }
+
+  const fee = student.feeHistory.id(fee_id);
+  if (!fee) {
+    throw new ApiError(400, "Fee not found");
+  }
+
+  return res.status(200).json(new ApiResponse(200, fee, "Fee not found"));
 });
