@@ -41,11 +41,17 @@ export const addFeeRecord = asyncHandler(async (req, res) => {
       note: note ?? null,
     });
   }
-  await student.save({ validateBeforeSave: false });
+
+  const student1 = await Student.findById(student_id).populate(
+    "feeHistory.batch",
+    "name monthlyFees",
+  ); // ← name shows up here
+
+  if (!student1) throw new ApiError(404, "Student not found.");
 
   return res
     .status(201)
-    .json(new ApiResponse(201, student.feeHistory, "Fee records added."));
+    .json(new ApiResponse(201, student1.feeHistory, "Fee records added."));
 });
 
 export const feeById = asyncHandler(async (req, res) => {
@@ -56,12 +62,16 @@ export const feeById = asyncHandler(async (req, res) => {
 
   const { student_id, fee_id } = req.params;
 
-  const student = await Student.findById(student_id);
+  const student = await Student.findById(student_id).populate(
+    "feeHistory.batch",
+    "name monthlyFees",
+  );
   if (!student) {
     throw new ApiError(400, "Student not found.");
   }
 
   const fee = student.feeHistory.id(fee_id);
+
   if (!fee) {
     throw new ApiError(400, "Fee not found");
   }
