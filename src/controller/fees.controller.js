@@ -143,3 +143,77 @@ export const markEachFeePaid = asyncHandler(async (req, res) => {
 
   return res.status(200).json(new ApiResponse(200, student, "fees paid."));
 });
+
+export const getStudentFeeHistory = asyncHandler(async (req, res) => {
+  const user = req.user;
+
+  if (!user) {
+    throw new ApiError(403, "User not logged In.");
+  }
+
+  const { student_id } = req.params;
+
+  const student = await Student.findById(student_id).populate({
+    path: "feeHistory.batch",
+    select: "name",
+  });
+  if (!student) {
+    throw new ApiError(401, "Student not found");
+  }
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, student.feeHistory, "Fee History."));
+});
+
+export const getStudentBalance = asyncHandler(async (req, res) => {
+  const user = req.user;
+
+  if (!user) {
+    throw new ApiError(403, "User not logged In.");
+  }
+
+  const { student_id } = req.params;
+
+  const student = await Student.findById(student_id);
+
+  if (!student) {
+    throw new ApiError(401, "Student not found");
+  }
+
+  let totalPaid = 0;
+  let totalPending = 0;
+  let overdue = [];
+
+  const now = new Date();
+
+  student.feeHistory.forEach((record) => {
+    console.log("record:", record);
+    if (record.status == "paid") {
+      totalPaid += record.amount;
+    } else {
+      if (record.dueDate < now) {
+        overdue.push(record);
+      } else {
+        totalPending += record.amount;
+      }
+    }
+  });
+
+  return res.status(200).json(
+    new ApiResponse(
+      200,
+
+      {
+        // total_fees: student.total_fees, // monthly obligation
+        totalPaid, // sum of all paid records
+        totalPending, // sum of all pending records
+        // balance: totalPending, // what's still owed
+        overdueCount: overdue.length, // how many are overdue
+        overdue, // the actual overdue records
+      },
+
+      "fees not found.",
+    ),
+  );
+});

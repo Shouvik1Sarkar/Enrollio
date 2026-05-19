@@ -7,6 +7,8 @@ import authorizeRoles from "../middleware/authorizeRoles.middleware.js";
 import {
   addFeeRecord,
   feeById,
+  getStudentBalance,
+  getStudentFeeHistory,
   markEachFeePaid,
   markFeePaid,
 } from "../controller/fees.controller.js";
@@ -44,6 +46,19 @@ feesRouter.patch(
   logInAuth,
   authorizeRoles(admin, super_admin),
   markEachFeePaid, // mark a specific fee record as paid
+);
+
+feesRouter.get(
+  "/:student_id/fees",
+  logInAuth,
+  authorizeRoles(admin, super_admin, teacher),
+  getStudentFeeHistory, // full fee history of one student
+);
+feesRouter.get(
+  "/balance/:student_id",
+  logInAuth,
+  authorizeRoles(admin, super_admin, teacher),
+  getStudentBalance, // total due vs paid vs balance
 );
 
 export default feesRouter;
