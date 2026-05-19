@@ -78,3 +78,68 @@ export const feeById = asyncHandler(async (req, res) => {
 
   return res.status(200).json(new ApiResponse(200, fee, "Fee not found"));
 });
+
+export const markFeePaid = asyncHandler(async (req, res) => {
+  const user = req.user;
+
+  if (!user) {
+    throw new ApiError(403, "User not logged In.");
+  }
+
+  const { student_id } = req.params;
+  const { note } = req.body;
+
+  const student = await Student.findById(student_id);
+  if (!student) {
+    throw new ApiError(401, "Student not found");
+  }
+
+  student.feeHistory.forEach((record) => {
+    if (record.status == "paid") {
+      throw new ApiError(401, "Fees paid.");
+    }
+    record.status = "paid";
+    record.paidAt = new Date();
+    record.collectedBy = user._id;
+    record.note = note ?? "";
+  });
+
+  await student.save({ validateBeforeSave: false });
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, student.feeHistory, "Fee marked as paid."));
+});
+
+export const markEachFeePaid = asyncHandler(async (req, res) => {
+  const user = req.user;
+
+  if (!user) {
+    throw new ApiError(403, "User not logged In.");
+  }
+
+  const { student_id, fee_id } = req.params;
+  const { note } = req.body;
+
+  const student = await Student.findById(student_id);
+  if (!student) {
+    throw new ApiError(401, "Student not found");
+  }
+
+  const fees = await student.feeHistory.id(fee_id);
+  if (!fees) {
+    throw new ApiError(400, "Fees Not Found.");
+  }
+
+  if (fees.status == "paid") {
+    throw new ApiError(400, "Fees already.");
+  }
+
+  fees.status = "paid";
+  fees.paidAt = new Date();
+  fees.collectedBy = user._id;
+  fees.note = note ?? "";
+  await student.save({ validateBeforeSave: false });
+
+  return res.status(200).json(new ApiResponse(200, student, "fees paid."));
+});

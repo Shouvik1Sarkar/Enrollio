@@ -76,7 +76,7 @@ export const enrollStudentInBatch = asyncHandler(async (req, res) => {
   }
 
   const { student_id } = req.params;
-  const { batchName } = req.body;
+  const { batchName, note } = req.body;
 
   if (!batchName) {
     throw new ApiError(400, "Batch name is required");
@@ -115,6 +115,22 @@ export const enrollStudentInBatch = asyncHandler(async (req, res) => {
   });
 
   await Batch.findByIdAndUpdate(batch._id, { $push: { students: student_id } });
+
+  const now = new Date();
+
+  const month = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+  const dueDate = new Date(now.getFullYear(), now.getMonth(), 10);
+
+  student.feeHistory.push({
+    batch: batch._id,
+    amount: batch.monthlyFees,
+    month,
+    dueDate,
+    status: "pending",
+    note: note ?? null,
+  });
+
+  await student.save({ validateBeforeSave: false });
 
   return res
     .status(200)
