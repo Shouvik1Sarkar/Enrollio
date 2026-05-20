@@ -64,7 +64,6 @@ export const createBatch = asyncHandler(async (req, res) => {
     course: course._id,
     learningMode,
     schedule,
-    monthlyFees,
     createdBy: req.user._id,
     serial,
     monthlyFees: monthlyFees ?? undefined,
@@ -78,19 +77,15 @@ export const createBatch = asyncHandler(async (req, res) => {
 });
 
 export const getAllBatches = asyncHandler(async (req, res) => {
-  const user = req.user;
-
-  console.log("USER->", user);
-
-  const myUser = await User.findById(user._id);
-  // console.log("MY USER->", myUser);
-
-  if (myUser.role !== available_user_roles.SUPER_ADMIN) {
-    throw new ApiError(403, "Only Super Amin can see all batches.");
-  }
+  const myUser = req.user;
 
   if (!myUser) {
-    throw new ApiError(400, "User not logged in.");
+    throw new ApiError(401, "User not logged in.");
+  }
+  if (myUser.role !== available_user_roles.SUPER_ADMIN) {
+    // console.log("MY USER->", myUser);
+
+    throw new ApiError(403, "Only Super Amin can see all batches.");
   }
 
   const allBatches = await Batch.find().populate({

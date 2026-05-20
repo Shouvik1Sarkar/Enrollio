@@ -43,6 +43,8 @@ export const addFeeRecord = asyncHandler(async (req, res) => {
     });
   }
 
+  student.save({ validateBeforeSave: false });
+
   const student1 = await Student.findById(student_id).populate(
     "feeHistory.batch",
     "name monthlyFees",
@@ -154,14 +156,14 @@ export const feeById = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Fee not found");
   }
 
-  return res.status(200).json(new ApiResponse(200, fee, "Fee not found"));
+  return res.status(200).json(new ApiResponse(200, fee, "Fee found."));
 });
 
 export const markFeePaid = asyncHandler(async (req, res) => {
   const user = req.user;
 
   if (!user) {
-    throw new ApiError(403, "User not logged In.");
+    throw new ApiError(401, "User not logged In.");
   }
 
   const { student_id } = req.params;
@@ -169,19 +171,18 @@ export const markFeePaid = asyncHandler(async (req, res) => {
 
   const student = await Student.findById(student_id);
   if (!student) {
-    throw new ApiError(401, "Student not found");
+    throw new ApiError(404, "Student not found");
   }
 
-  student.feeHistory.forEach((record) => {
-    if (record.status == "paid") {
-      throw new ApiError(401, "Fees paid.");
-    }
+  const unpaid = student.feeHistory.filter((r) => r.status !== "paid");
+  if (unpaid.length === 0) throw new ApiError(400, "All fees already paid.");
+
+  unpaid.forEach((record) => {
     record.status = "paid";
     record.paidAt = new Date();
     record.collectedBy = user._id;
-    record.note = note ?? "";
+    record.note = note ?? null;
   });
-
   await student.save({ validateBeforeSave: false });
 
   return res
@@ -296,29 +297,47 @@ export const getStudentBalance = asyncHandler(async (req, res) => {
   );
 });
 
+// export const deleteFeeRecord = asyncHandler(async (req, res) => {
+//   const { student_id, fee_id } = req.params;
+
+//   const astudent = await Student.findById(student_id);
+
+//   if (!astudent) {
+//     throw new ApiError(400, "Student not found.");
+//   }
+
+//   const fee = await astudent.feeHistory.id(fee_id);
+//   if (!fee) {
+//     throw new ApiError(400, "Fee not found");
+//   }
+
+//   const student = await Student.findByIdAndUpdate(student_id, {
+//     $inc: { total_fees: -fee.amount },
+//   });
+//   if (!student) throw new ApiError(404, "Student not found.");
+
+//   const feeRecord = student.feeHistory.id(fee_id);
+//   if (!feeRecord) throw new ApiError(404, "Fee record not found.");
+
+//   student.feeHistory.pull({ _id: fee_id });
+//   await student.save({ validateBeforeSave: false });
+
+//   return res
+//     .status(200)
+//     .json(new ApiResponse(200, null, "Fee record deleted."));
+// });
+
 export const deleteFeeRecord = asyncHandler(async (req, res) => {
   const { student_id, fee_id } = req.params;
 
-  const astudent = await Student.findById(student_id);
-
-  if (!astudent) {
-    throw new ApiError(400, "Student not found.");
-  }
-
-  const fee = await astudent.feeHistory.id(fee_id);
-  if (!fee) {
-    throw new ApiError(400, "Fee not found");
-  }
-
-  const student = await Student.findByIdAndUpdate(student_id, {
-    $inc: { total_fees: -fee.amount },
-  });
+  const student = await Student.findById(student_id);
   if (!student) throw new ApiError(404, "Student not found.");
 
-  const feeRecord = student.feeHistory.id(fee_id);
-  if (!feeRecord) throw new ApiError(404, "Fee record not found.");
+  const fee = student.feeHistory.id(fee_id); // no await — not async
+  if (!fee) throw new ApiError(404, "Fee not found.");
 
   student.feeHistory.pull({ _id: fee_id });
+  student.total_fees -= fee.amount;
   await student.save({ validateBeforeSave: false });
 
   return res
