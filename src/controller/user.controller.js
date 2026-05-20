@@ -9,18 +9,19 @@ import {
 } from "../utils/constants.utils.js";
 
 export const getUser = asyncHandler(async (req, res) => {
-  const user = req.user;
-  if (!user) {
+  const myUser = req.user;
+
+  if (!myUser) {
     throw new ApiError(401, "User not logged in.");
   }
 
-  const userId = req.user._id;
+  // const userId = req.user._id;
 
-  const myUser = await User.findById(userId).select("-password -refreshToken");
+  // const myUser = await User.findById(userId).select("-password -refreshToken");
 
-  if (!myUser) {
-    throw new ApiError(401, "User not found");
-  }
+  // if (!myUser) {
+  //   throw new ApiError(401, "User not found");
+  // }
 
   const response_data = { ...myUser.toObject() };
 
@@ -42,16 +43,9 @@ export const getUser = asyncHandler(async (req, res) => {
 });
 
 export const updateUser = asyncHandler(async (req, res) => {
-  if (!req.user) {
-    throw new ApiError(401, "Not logged in.");
-  }
-
-  const userId = req.user?._id;
-
-  const myUser = await User.findById(userId).select("-password -refreshToken");
-
+  const myUser = req.user;
   if (!myUser) {
-    throw new ApiError(401, "User not found");
+    throw new ApiError(401, "Not logged in.");
   }
 
   if (myUser.role === available_user_roles.STUDENT) {
@@ -161,17 +155,18 @@ export const deleteUser = asyncHandler(async (req, res) => {
 });
 
 export const allUsers = asyncHandler(async (req, res) => {
-  if (!req.user) {
+  const myUser = req.user;
+  if (!myUser) {
     throw new ApiError(401, "Not logged in.");
   }
 
-  const userId = req.user?._id;
+  // const userId = req.user?._id;
 
-  const myUser = await User.findById(userId).select("-password -refreshToken");
+  // const myUser = await User.findById(userId).select("-password -refreshToken");
 
-  if (myUser.role !== available_user_roles.SUPER_ADMIN) {
-    throw new ApiError(401, null, "Only super admin can delete an account");
-  }
+  // if (myUser.role !== available_user_roles.SUPER_ADMIN) {
+  //   throw new ApiError(401, null, "Only super admin can delete an account");
+  // }
 
   const allUsers = await User.find();
 
@@ -195,17 +190,18 @@ export const allUsers = asyncHandler(async (req, res) => {
 });
 
 export const updateUserRole = asyncHandler(async (req, res) => {
-  if (!req.user) {
+  const myUser = req.user;
+  if (!myUser) {
     throw new ApiError(401, "Not logged in.");
   }
 
-  const userId = req.user?._id;
+  // const userId = req.user?._id;
 
-  const myUser = await User.findById(userId).select("-password -refreshToken");
+  // const myUser = await User.findById(userId).select("-password -refreshToken");
 
-  if (!myUser) {
-    throw new ApiError(401, "User not found");
-  }
+  // if (!myUser) {
+  //   throw new ApiError(401, "User not found");
+  // }
 
   if (myUser.role !== available_user_roles.SUPER_ADMIN) {
     throw new ApiError(403, "Only Super Admin can change User role.");
@@ -241,17 +237,18 @@ export const updateUserRole = asyncHandler(async (req, res) => {
 // Might change to only SUPER_ADMIN CAN DO THIS.
 
 export const getUserById = asyncHandler(async (req, res) => {
-  if (!req.user) {
+  const myUser = req.user;
+  if (!myUser) {
     throw new ApiError(401, "Not logged in.");
   }
 
-  const userId = req.user?._id;
+  // const userId = req.user?._id;
 
-  const myUser = await User.findById(userId).select("-password -refreshToken");
+  // const myUser = await User.findById(userId).select("-password -refreshToken");
 
-  if (!myUser) {
-    throw new ApiError(401, "User not found");
-  }
+  // if (!myUser) {
+  //   throw new ApiError(401, "User not found");
+  // }
 
   if (
     myUser.role === available_user_roles.STUDENT ||
@@ -294,17 +291,18 @@ export const getUserById = asyncHandler(async (req, res) => {
 // Might change to only SUPER_ADMIN CAN DO THIS.
 
 export const getUserByUserName = asyncHandler(async (req, res) => {
-  if (!req.user) {
+  const myUser = req.user;
+  if (!myUser) {
     throw new ApiError(401, "Not logged in.");
   }
 
-  const userId = req.user?._id;
+  // const userId = req.user?._id;
 
-  const myUser = await User.findById(userId).select("-password -refreshToken");
+  // const myUser = await User.findById(userId).select("-password -refreshToken");
 
-  if (!myUser) {
-    throw new ApiError(401, "User not found");
-  }
+  // if (!myUser) {
+  //   throw new ApiError(401, "User not found");
+  // }
 
   if (myUser.role === available_user_roles.STUDENT) {
     throw new ApiError(403, "Students cannot update accounts.");
