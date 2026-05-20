@@ -6,6 +6,7 @@ import { available_user_roles } from "../utils/constants.utils.js";
 import authorizeRoles from "../middleware/authorizeRoles.middleware.js";
 import {
   addFeeRecord,
+  deleteFeeRecord,
   feeById,
   getStudentBalance,
   getStudentFeeHistory,
@@ -59,6 +60,13 @@ feesRouter.get(
   logInAuth,
   authorizeRoles(admin, super_admin, teacher),
   getStudentBalance, // total due vs paid vs balance
+);
+
+feesRouter.delete(
+  "/:student_id/fees/:fee_id",
+  logInAuth,
+  authorizeRoles(admin, super_admin),
+  deleteFeeRecord, // remove a wrong entry
 );
 
 export default feesRouter;

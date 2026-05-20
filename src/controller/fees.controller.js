@@ -217,3 +217,20 @@ export const getStudentBalance = asyncHandler(async (req, res) => {
     ),
   );
 });
+
+export const deleteFeeRecord = asyncHandler(async (req, res) => {
+  const { student_id, fee_id } = req.params;
+
+  const student = await Student.findById(student_id);
+  if (!student) throw new ApiError(404, "Student not found.");
+
+  const feeRecord = student.feeHistory.id(fee_id);
+  if (!feeRecord) throw new ApiError(404, "Fee record not found.");
+
+  student.feeHistory.pull({ _id: fee_id });
+  await student.save({ validateBeforeSave: false });
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, null, "Fee record deleted."));
+});

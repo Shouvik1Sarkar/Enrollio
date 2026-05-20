@@ -232,6 +232,7 @@ export const removeStudentFromBatch = asyncHandler(async (req, res) => {
 
   // check student is actually in this batch
   const isEnrolled = batch.students.some((id) => id.toString() === student_id);
+
   if (!isEnrolled) {
     throw new ApiError(400, "Student is not enrolled in this batch");
   }
@@ -247,11 +248,21 @@ export const removeStudentFromBatch = asyncHandler(async (req, res) => {
   // }
 
   // $pull handles ObjectId comparison correctly
+
   await Student.findByIdAndUpdate(student_id, {
     $pull: { enrolledBatches: batch_id },
+    $inc: { total_fees: -batch.monthlyFees },
   });
 
   await Batch.findByIdAndUpdate(batch_id, { $pull: { students: student_id } });
+
+  const updatedStudent = await Student.findById(student_id);
+
+  updatedStudent.feeHistory = updatedStudent.feeHistory.filter(
+    (record) => record.batch.toString() !== batch_id.toString(),
+  );
+
+  await updatedStudent.save({ validateBeforeSave: false });
 
   return res
     .status(200)
