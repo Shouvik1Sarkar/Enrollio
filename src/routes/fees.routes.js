@@ -6,6 +6,7 @@ import { available_user_roles } from "../utils/constants.utils.js";
 import authorizeRoles from "../middleware/authorizeRoles.middleware.js";
 import {
   addFeeRecord,
+  addSingleFeeRecord,
   deleteFeeRecord,
   feeById,
   getStudentBalance,
@@ -26,6 +27,12 @@ feesRouter.post(
   logInAuth,
   authorizeRoles(admin, super_admin),
   addFeeRecord, // admin adds a pending fee for a month
+);
+feesRouter.post(
+  "/:student_id/fees/add/:batch_id",
+  logInAuth,
+  authorizeRoles(admin, super_admin),
+  addSingleFeeRecord, // admin adds a pending fee for a month
 );
 
 feesRouter.get(
@@ -63,7 +70,7 @@ feesRouter.get(
 );
 
 feesRouter.delete(
-  "/:student_id/fees/:fee_id",
+  "/delete/:student_id/fees/:fee_id",
   logInAuth,
   authorizeRoles(admin, super_admin),
   deleteFeeRecord, // remove a wrong entry
