@@ -210,7 +210,7 @@ export const markEachFeePaid = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Fees Not Found.");
   }
 
-  if (fees.status == "paid") {
+  if (fees.status === "paid") {
     throw new ApiError(400, "Fees already.");
   }
 
@@ -268,7 +268,7 @@ export const getStudentBalance = asyncHandler(async (req, res) => {
 
   student.feeHistory.forEach((record) => {
     console.log("record:", record);
-    if (record.status == "paid") {
+    if (record.status === "paid") {
       totalPaid += record.amount;
     } else {
       if (record.dueDate < now) {
