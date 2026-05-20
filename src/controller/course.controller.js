@@ -6,9 +6,8 @@ import { available_user_roles, boards_enum } from "../utils/constants.utils.js";
 import User from "../models/user.models.js";
 
 export const createCourse = asyncHandler(async (req, res) => {
-  const user = req.user;
+  const myUser = req.user;
 
-  const myUser = await User.findById(user._id);
   if (!myUser) {
     throw new ApiError(400, "User not logged in.");
   }
@@ -71,9 +70,7 @@ export const createCourse = asyncHandler(async (req, res) => {
 });
 
 export const deleteCourse = asyncHandler(async (req, res) => {
-  const user = req.user;
-
-  const myUser = await User.findById(user._id);
+  const myUser = req.user;
 
   if (!myUser) {
     throw new ApiError(400, "User not logged in.");
@@ -99,9 +96,7 @@ export const deleteCourse = asyncHandler(async (req, res) => {
 });
 
 export const getAllCourses = asyncHandler(async (req, res) => {
-  const user = req.user;
-
-  const myUser = await User.findById(user._id);
+  const myUser = req.user;
 
   if (!myUser) {
     throw new ApiError(400, "User not logged in.");
@@ -117,9 +112,7 @@ export const getAllCourses = asyncHandler(async (req, res) => {
 });
 
 export const getCourseById = asyncHandler(async (req, res) => {
-  const user = req.user;
-
-  const myUser = await User.findById(user._id);
+  const myUser = req.user;
 
   if (!myUser) {
     throw new ApiError(400, "User not logged in.");
@@ -137,9 +130,7 @@ export const getCourseById = asyncHandler(async (req, res) => {
 });
 
 export const updateCourse = asyncHandler(async (req, res) => {
-  const user = req.user;
-
-  const myUser = await User.findById(user._id);
+  const myUser = req.user;
 
   if (!myUser) {
     throw new ApiError(400, "User not logged in.");

@@ -7,9 +7,7 @@ import asyncHandler from "../utils/asyncHandler.utils.js";
 import { available_user_roles } from "../utils/constants.utils.js";
 
 export const setupStudentProfile = asyncHandler(async (req, res) => {
-  const user = req.user;
-
-  const myUser = await User.findById(user._id);
+  const myUser = req.user;
 
   if (!myUser) {
     throw new ApiError(400, "User not logged in.");
@@ -46,9 +44,7 @@ export const setupStudentProfile = asyncHandler(async (req, res) => {
 });
 
 export const getAllStudents = asyncHandler(async (req, res) => {
-  const user = req.user;
-
-  const myUser = await User.findById(user._id);
+  const myUser = req.user;
 
   if (!myUser) {
     throw new ApiError(400, "User not logged in.");
@@ -70,6 +66,10 @@ export const getAllStudents = asyncHandler(async (req, res) => {
 
 export const enrollStudentInBatch = asyncHandler(async (req, res) => {
   const myUser = req.user;
+
+  if (!myUser) {
+    throw new ApiError(401, "User not logged In.");
+  }
 
   if (myUser.role === available_user_roles.STUDENT) {
     throw new ApiError(403, "Students cannot enroll other students");
@@ -138,9 +138,7 @@ export const enrollStudentInBatch = asyncHandler(async (req, res) => {
 });
 
 export const getStudentById = asyncHandler(async (req, res) => {
-  const user = req.user;
-
-  const myUser = await User.findById(user._id);
+  const myUser = req.user;
 
   if (!myUser) {
     throw new ApiError(400, "User not logged in.");
@@ -163,9 +161,7 @@ export const getStudentById = asyncHandler(async (req, res) => {
 });
 
 export const updateStudentProfile = asyncHandler(async (req, res) => {
-  const user = req.user;
-
-  const myUser = await User.findById(user._id);
+  const myUser = req.user;
 
   if (!myUser) {
     throw new ApiError(400, "User not logged in.");
@@ -212,9 +208,10 @@ export const updateStudentProfile = asyncHandler(async (req, res) => {
 });
 
 export const removeStudentFromBatch = asyncHandler(async (req, res) => {
-  const user = req.user;
-  const myUser = await User.findById(user._id);
-
+  const myUser = req.user;
+  if (!myUser) {
+    throw new ApiError(401, "User not logged in.");
+  }
   if (myUser.role === available_user_roles.STUDENT) {
     throw new ApiError(
       403,

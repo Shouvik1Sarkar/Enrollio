@@ -7,9 +7,9 @@ import asyncHandler from "../utils/asyncHandler.utils.js";
 import { available_user_roles } from "../utils/constants.utils.js";
 
 export const setupTeacherProfile = asyncHandler(async (req, res) => {
-  const user = req.user;
+  const myUser = req.user;
 
-  const myUser = await User.findById(user._id);
+  // const myUser = await User.findById(user._id);
 
   if (!myUser) {
     throw new ApiError(400, "User not logged in.");
@@ -48,9 +48,7 @@ export const setupTeacherProfile = asyncHandler(async (req, res) => {
 });
 
 export const updateTeacher = asyncHandler(async (req, res) => {
-  const user = req.user;
-
-  const myUser = await User.findById(user._id);
+  const myUser = req.user;
 
   if (!myUser) {
     throw new ApiError(400, "User not logged in.");
