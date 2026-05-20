@@ -262,11 +262,20 @@ export const removeStudent = asyncHandler(async (req, res) => {
 
   await Student.findByIdAndUpdate(student_id, {
     $pull: { enrolledBatches: batch_id },
+    $inc: { total_fees: -batch.monthlyFees },
   });
 
   await Batch.findByIdAndUpdate(batch_id, {
     $pull: { students: student_id },
   });
+
+  const updatedStudent = await Student.findById(student_id);
+
+  updatedStudent.feeHistory = updatedStudent.feeHistory.filter(
+    (record) => record.batch.toString() !== batch_id.toString(),
+  );
+
+  await updatedStudent.save({ validateBeforeSave: false });
 
   return res
     .status(200)
