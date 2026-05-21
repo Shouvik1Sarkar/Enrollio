@@ -49,6 +49,13 @@ const teacherSchema = new mongoose.Schema(
       type: Number,
       default: null, // base monthly salary set by admin
     },
+
+    // salaryRecord: [
+    //   {
+    //     type: mongoose.Schema.Types.ObjectId,
+    //     ref: "Salary",
+    //   },
+    // ],
   },
   { timestamps: true },
 );

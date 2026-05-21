@@ -1,4 +1,5 @@
 import Batch from "../models/batch.models.js";
+import Salary from "../models/salary.models.js";
 import Teacher from "../models/teacher.models.js";
 import User from "../models/user.models.js";
 import ApiError from "../utils/ApiError.utils.js";
@@ -195,7 +196,13 @@ export const getTeacherById = asyncHandler(async (req, res) => {
     throw new ApiError(404, "Tacher not found");
   }
 
-  return res.status(200).json(new ApiResponse(200, teacher, "Teacher"));
+  const salary = await Salary.findOne({
+    user: teacher.userId,
+  });
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, { ...teacher.toObject(), salary }, "Teacher"));
 });
 
 // export const getTeacherBatches = asyncHandler(async (req, res) => {});
