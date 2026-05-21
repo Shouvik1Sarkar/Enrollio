@@ -203,3 +203,26 @@ export const getAllSalaries = asyncHandler(async (req, res) => {
 
   return res.status(200).json(new ApiResponse(200, salaries, "Salary found."));
 });
+
+export const getSalariesByMonth = asyncHandler(async (req, res) => {
+  const user = req.user;
+
+  if (!user) {
+    throw new ApiError(403, "User not logged In.");
+  }
+
+  if (!["super_admin", "admin"].includes(user.role)) {
+    throw new ApiError(400, "User is not a teacher or admin.");
+  }
+
+  const { month } = req.params;
+
+  const salaries = await Salary.find({
+    month,
+  });
+  if (!salaries) {
+    throw new ApiError(400, "Salaries found.");
+  }
+
+  return res.status(200).json(new ApiResponse(200, salaries, "Salary found."));
+});
