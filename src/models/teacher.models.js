@@ -1,28 +1,5 @@
 import mongoose from "mongoose";
 
-const salaryRecordSchema = new mongoose.Schema(
-  {
-    month: {
-      type: String, // "2025-01", "2025-02" — easy to query
-      required: true,
-    },
-    amount: {
-      type: Number,
-      required: true,
-    },
-    status: {
-      type: String,
-      enum: ["paid", "pending"],
-      default: "pending",
-    },
-    paidAt: {
-      type: Date,
-      default: null, // filled when marked paid
-    },
-  },
-  { _id: false },
-);
-
 const teacherSchema = new mongoose.Schema(
   {
     userId: {
@@ -72,8 +49,6 @@ const teacherSchema = new mongoose.Schema(
       type: Number,
       default: null, // base monthly salary set by admin
     },
-
-    salaryHistory: [salaryRecordSchema], // full monthly history
   },
   { timestamps: true },
 );

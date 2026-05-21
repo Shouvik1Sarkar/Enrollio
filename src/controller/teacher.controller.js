@@ -35,7 +35,7 @@ export const setupTeacherProfile = asyncHandler(async (req, res) => {
     experience,
     subjects,
     createdBy: req.user._id,
-    salary,
+    salary: salary || undefined,
   });
 
   if (!teacher) {
@@ -84,6 +84,29 @@ export const updateTeacher = asyncHandler(async (req, res) => {
   return res
     .status(200)
     .json(new ApiResponse(200, userTeacher, "Teacher updated."));
+});
+
+// ***UPDATE SALARY***
+
+export const updateSalary = asyncHandler(async (req, res) => {
+  const user = req.user;
+  if (!user) {
+    throw new ApiError(400, "User Logged In---------");
+  }
+
+  const { teacher_id } = req.params;
+  const { salary } = req.body;
+
+  const teacher = await Teacher.findById(teacher_id);
+
+  if (!teacher) {
+    throw new ApiError(400, "User not found.");
+  }
+  teacher.salary = salary;
+  await teacher.save({ validateBeforeSave: false });
+  return res
+    .status(200)
+    .json(new ApiResponse(200, teacher, "Teacher Salary upsated."));
 });
 
 export const getMyBatches = asyncHandler(async (req, res) => {
@@ -181,3 +204,26 @@ export const getTeacherById = asyncHandler(async (req, res) => {
 //   }
 
 // });
+
+export const deleteTeacher = asyncHandler(async (req, res) => {
+  const user = req.user;
+  if (!user) {
+    throw new ApiError(400, "User Logged In---------");
+  }
+
+  if (user.role !== "super_admin") {
+    throw new ApiError(400, "Only Super can delete a Teacher.");
+  }
+
+  const { teacher_id } = req.params;
+
+  const teacher = await Teacher.findById(teacher_id);
+
+  if (!teacher) {
+    throw new ApiError(400, "User not found.");
+  }
+
+  await Teacher.findByIdAndDelete(teacher_id);
+
+  return res.status(200).json(new ApiResponse(200, null, "Teacher deleted."));
+});

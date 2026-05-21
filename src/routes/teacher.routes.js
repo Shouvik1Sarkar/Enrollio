@@ -3,9 +3,11 @@ import { Router } from "express";
 import { logInAuth } from "../middleware/logInAuth.middleware.js";
 import {
   assignTeacherToBatch,
+  deleteTeacher,
   getMyBatches,
   getTeacherById,
   setupTeacherProfile,
+  updateSalary,
   updateTeacher,
 } from "../controller/teacher.controller.js";
 import authorizeRoles from "../middleware/authorizeRoles.middleware.js";
@@ -24,6 +26,19 @@ teacherRouter.post(
   logInAuth,
   authorizeRoles(admin, super_admin),
   updateTeacher,
+);
+teacherRouter.patch(
+  "/update/salary/:teacher_id",
+  logInAuth,
+  authorizeRoles(admin, super_admin),
+  updateSalary,
+);
+
+teacherRouter.delete(
+  "/delete/:teacher_id",
+  logInAuth,
+  authorizeRoles(admin, super_admin),
+  deleteTeacher,
 );
 
 // teacher.routes.js
