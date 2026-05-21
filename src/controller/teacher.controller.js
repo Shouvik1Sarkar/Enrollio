@@ -97,6 +97,10 @@ export const updateSalary = asyncHandler(async (req, res) => {
   const { teacher_id } = req.params;
   const { salary } = req.body;
 
+  if (!salary || salary <= 0) {
+    throw new ApiError(400, "Valid salary amount is required.");
+  }
+
   const teacher = await Teacher.findById(teacher_id);
 
   if (!teacher) {
@@ -223,7 +227,13 @@ export const deleteTeacher = asyncHandler(async (req, res) => {
     throw new ApiError(400, "User not found.");
   }
 
+  const getUser = await User.findById(teacher.userId);
+  if (!getUser) {
+    throw new ApiError(400, "User not found.");
+  }
+
   await Teacher.findByIdAndDelete(teacher_id);
+  await User.findByIdAndDelete(teacher.userId);
 
   return res.status(200).json(new ApiResponse(200, null, "Teacher deleted."));
 });

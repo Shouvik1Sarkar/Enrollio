@@ -1,4 +1,5 @@
 import Student from "../models/student.models.js";
+import Teacher from "../models/teacher.models.js";
 import User from "../models/user.models.js";
 import ApiError from "../utils/ApiError.utils.js";
 import ApiResponse from "../utils/ApiResponse.utils.js";
