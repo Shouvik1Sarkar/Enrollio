@@ -4,7 +4,11 @@ import { logInAuth } from "../middleware/logInAuth.middleware.js";
 
 import { available_user_roles } from "../utils/constants.utils.js";
 import authorizeRoles from "../middleware/authorizeRoles.middleware.js";
-import { set_salary } from "../controller/salary.controller.js";
+import {
+  paid_salary,
+  salary_history,
+  set_salary,
+} from "../controller/salary.controller.js";
 
 const salaryRouter = Router();
 
@@ -18,6 +22,18 @@ salaryRouter.post(
   logInAuth,
   authorizeRoles(admin, super_admin),
   set_salary,
+);
+salaryRouter.post(
+  "/paid/:user_id",
+  logInAuth,
+  authorizeRoles(admin, super_admin),
+  paid_salary,
+);
+salaryRouter.get(
+  "/paid/:user_id",
+  logInAuth,
+  authorizeRoles(admin, super_admin),
+  salary_history,
 );
 
 export default salaryRouter;
