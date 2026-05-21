@@ -5,6 +5,7 @@ import { logInAuth } from "../middleware/logInAuth.middleware.js";
 import { available_user_roles } from "../utils/constants.utils.js";
 import authorizeRoles from "../middleware/authorizeRoles.middleware.js";
 import {
+  getAllSalaries,
   paid_salary,
   salary_history,
   set_salary,
@@ -35,5 +36,37 @@ salaryRouter.get(
   authorizeRoles(admin, super_admin),
   salary_history,
 );
+
+// get all pending/overdue salaries — admin dashboard view
+salaryRouter.get(
+  "/all",
+  logInAuth,
+  authorizeRoles(admin, super_admin),
+  getAllSalaries,
+);
+
+// get salary by specific month
+// salaryRouter.get(
+//   "/month/:month",         // e.g. /month/2026-05
+//   logInAuth,
+//   authorizeRoles(admin, super_admin),
+//   getSalariesByMonth
+// );
+
+// update base salary of a teacher/admin
+// salaryRouter.patch(
+//   "/base/:user_id",
+//   logInAuth,
+//   authorizeRoles(super_admin),
+//   setBaseSalary
+// );
+
+// delete a wrong salary record
+// salaryRouter.delete(
+//   "/:salary_id",
+//   logInAuth,
+//   authorizeRoles(super_admin),
+//   deleteSalaryRecord
+// );
 
 export default salaryRouter;
