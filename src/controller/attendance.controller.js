@@ -7,7 +7,4 @@ export const createAttendance = asyncHandler(async (req, res) => {
   if (!user) {
     throw new ApiError(400, "User not logged In.");
   }
-
-  
-  
 });
