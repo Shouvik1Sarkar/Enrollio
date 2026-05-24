@@ -89,6 +89,13 @@ const batchSchema = new mongoose.Schema(
       required: true,
     },
 
+    examHistory: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Exam",
+      },
+    ],
+
     // fees: {
     //   type: Number,
     //   required: true, // admin sets this when creating the batch
