@@ -10,6 +10,7 @@ import {
   paid_salary,
   salary_history,
   set_salary,
+  setBaseSalary,
 } from "../controller/salary.controller.js";
 
 const salaryRouter = Router();
@@ -59,15 +60,15 @@ salaryRouter.get(
 //   "/base/:user_id",
 //   logInAuth,
 //   authorizeRoles(super_admin),
-//   setBaseSalary
+//   setBaseSalary,
 // );
 
 // delete a wrong salary record
-// salaryRouter.delete(
-//   "/:salary_id",
-//   logInAuth,
-//   authorizeRoles(super_admin),
-//   deleteSalaryRecord
-// );
+salaryRouter.delete(
+  "/:salary_id",
+  logInAuth,
+  authorizeRoles(super_admin),
+  deleteSalaryRecord,
+);
 
 export default salaryRouter;
