@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 const examSchema = new mongoose.Schema(
   {
     batch: {

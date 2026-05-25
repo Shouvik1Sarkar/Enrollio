@@ -227,19 +227,19 @@ export const deleteSalaryRecord = asyncHandler(async (req, res) => {
   return res.status(200).json(new ApiResponse(200, salaries, "Salary found."));
 });
 
-export const deleteSalaryRecord = asyncHandler(async (req, res) => {
-  // ← fix name
-  const user = req.user;
-  if (!user) throw new ApiError(401, "User not logged in.");
+// export const deleteSalaryRecord = asyncHandler(async (req, res) => {
+//   // ← fix name
+//   const user = req.user;
+//   if (!user) throw new ApiError(401, "User not logged in.");
 
-  const { salary_id } = req.params;
+//   const { salary_id } = req.params;
 
-  const salary = await Salary.findById(salary_id);
-  if (!salary) throw new ApiError(404, "Salary not found.");
+//   const salary = await Salary.findById(salary_id);
+//   if (!salary) throw new ApiError(404, "Salary not found.");
 
-  await salary.deleteOne(); // cleaner than findByIdAndDelete after already fetching
+//   await salary.deleteOne(); // cleaner than findByIdAndDelete after already fetching
 
-  return res
-    .status(200)
-    .json(new ApiResponse(200, null, "Salary record deleted."));
-});
+//   return res
+//     .status(200)
+//     .json(new ApiResponse(200, null, "Salary record deleted."));
+// });

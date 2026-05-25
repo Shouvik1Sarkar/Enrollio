@@ -5,12 +5,12 @@ import { logInAuth } from "../middleware/logInAuth.middleware.js";
 import { available_user_roles } from "../utils/constants.utils.js";
 import authorizeRoles from "../middleware/authorizeRoles.middleware.js";
 import {
+  deleteSalaryRecord,
   getAllSalaries,
-  getSalariesByMonth,
+  // getSalariesByMonth,
   paid_salary,
   salary_history,
   set_salary,
-  setBaseSalary,
 } from "../controller/salary.controller.js";
 
 const salaryRouter = Router();
@@ -48,12 +48,12 @@ salaryRouter.get(
 );
 
 // get salary by specific month
-salaryRouter.get(
-  "/month/:month", // e.g. /month/2026-05
-  logInAuth,
-  authorizeRoles(admin, super_admin),
-  getSalariesByMonth,
-);
+// salaryRouter.get(
+//   "/month/:month", // e.g. /month/2026-05
+//   logInAuth,
+//   authorizeRoles(admin, super_admin),
+//   getSalariesByMonth,
+// );
 
 // update base salary of a teacher/admin
 // salaryRouter.patch(
