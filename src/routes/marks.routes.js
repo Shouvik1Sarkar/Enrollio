@@ -10,7 +10,11 @@ import {
 } from "../controller/course.controller.js";
 import authorizeRoles from "../middleware/authorizeRoles.middleware.js";
 import { available_user_roles } from "../utils/constants.utils.js";
-import { createMarks, updateMarks } from "../controller/marks.controller.js";
+import {
+  createMarks,
+  deleteMarks,
+  updateMarks,
+} from "../controller/marks.controller.js";
 
 const marksRouter = Router();
 
@@ -31,6 +35,13 @@ marksRouter.patch(
   logInAuth,
   authorizeRoles(admin, super_admin, teacher),
   updateMarks,
+);
+
+marksRouter.patch(
+  "/update/:marks_id",
+  logInAuth,
+  authorizeRoles(admin, super_admin, teacher),
+  deleteMarks,
 );
 
 export default marksRouter;

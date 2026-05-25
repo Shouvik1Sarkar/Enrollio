@@ -118,3 +118,23 @@ export const updateMarks = asyncHandler(async (req, res) => {
   await marks.save();
   return res.status(200).json(new ApiResponse(200, marks, "Marks Updated."));
 });
+
+export const deleteMarks = asyncHandler(async (req, res) => {
+  const user = req.user;
+
+  if (!user) {
+    throw new ApiError(403, "User not logged In.");
+  }
+
+  const { marks_id } = req.params;
+
+  const marks = await Marks.findById(marks_id);
+
+  if (!marks) {
+    throw new ApiError(400, "Marks not found.");
+  }
+
+  await marks.deleteOne();
+
+  return res.status(200).json(new ApiResponse(200, null, "Marks deleted."));
+});
