@@ -62,4 +62,3 @@ const marksSchema = new mongoose.Schema(
 
 const Marks = mongoose.model("Marks", marksSchema);
 export default Marks;
-E

@@ -10,6 +10,7 @@ import teacherRouter from "./routes/teacher.routes.js";
 import feesRouter from "./routes/fees.routes.js";
 import salaryRouter from "./routes/salary.routes.js";
 import examRouter from "./routes/exam.routes.js";
+import marksRouter from "./routes/marks.routes.js";
 // import attendanceRouter from "./routes/attendance.routes.js";
 
 const app = express();
@@ -45,6 +46,7 @@ app.use("/api/v1/teacher", teacherRouter);
 app.use("/api/v1/fees", feesRouter);
 app.use("/api/v1/salary", salaryRouter);
 app.use("/api/v1/exam", examRouter);
+app.use("/api/v1/marks", marksRouter);
 // app.use("/api/v1/attendence", attendanceRouter);
 
 export default app;
