@@ -31,18 +31,21 @@ examRouter.post(
   authorizeRoles(admin, super_admin, teacher),
   createExam,
 );
+
 examRouter.get(
   "/get/:exam_id",
   logInAuth,
   authorizeRoles(admin, super_admin, teacher),
   getExamById,
 );
+
 examRouter.patch(
   "/update/:exam_id",
   logInAuth,
   authorizeRoles(admin, super_admin, teacher),
   updateExam,
 );
+
 examRouter.delete(
   "/delete/:exam_id",
   logInAuth,
