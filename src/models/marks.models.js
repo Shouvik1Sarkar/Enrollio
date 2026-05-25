@@ -13,7 +13,11 @@ const marksSchema = new mongoose.Schema(
       ref: "Teacher",
       required: true,
     },
-
+    exam: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Batch",
+      required: true,
+    },
     batch: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Batch", // carries subject, standard, board — no need to repeat
@@ -58,3 +62,4 @@ const marksSchema = new mongoose.Schema(
 
 const Marks = mongoose.model("Marks", marksSchema);
 export default Marks;
+E
