@@ -6,6 +6,7 @@ import User from "../models/user.models.js";
 import ApiError from "../utils/ApiError.utils.js";
 import ApiResponse from "../utils/ApiResponse.utils.js";
 import asyncHandler from "../utils/asyncHandler.utils.js";
+import logger from "../utils/logger.utils.js";
 
 export const createMarks = asyncHandler(async (req, res) => {
   const user = req.user;
@@ -199,5 +200,54 @@ export const getMarksByStudent = asyncHandler(async (req, res) => {
 
   return res.status(200).json(new ApiResponse(200, marks, "All Marks."));
 });
-export const getMyMarks = asyncHandler(async (req, res) => {});
-export const getMarksById = asyncHandler(async (req, res) => {});
+
+export const getMyMarks = asyncHandler(async (req, res) => {
+  const user = req.user;
+
+  if (!user) {
+    throw new ApiError(403, "User not logged In.");
+  }
+
+  if (user.role !== "student") {
+    throw new ApiError(400, "Only student can do this");
+  }
+
+  const marks = await Marks.find({
+    student: user._id,
+  });
+
+  if (!marks) {
+    throw new ApiError(400, "Marks not found.");
+  }
+
+  return res.status(200).json(new ApiResponse(200, marks, "My Marks."));
+});
+
+export const getMarksById = asyncHandler(async (req, res) => {
+  const user = req.user;
+
+  if (!user) {
+    throw new ApiError(403, "User not logged In.");
+  }
+
+  const { marks_id } = req.params;
+
+  const mark = await Marks.findById(marks_id)
+    .populate({
+      path: "student",
+      select: "",
+      populate: {
+        path: "userId",
+        model: "User",
+        select: "name email", // whatever fields are on User
+      },
+    })
+    .populate("exam", "batch title date totalMarks passingMarks")
+    .populate("batch", "name course teacher");
+
+  if (!mark) {
+    throw new ApiError(400, "Marks not found.");
+  }
+
+  return res.status(200).json(new ApiResponse(200, mark, "My Marks."));
+});
