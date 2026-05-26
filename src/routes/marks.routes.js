@@ -13,6 +13,10 @@ import { available_user_roles } from "../utils/constants.utils.js";
 import {
   createMarks,
   deleteMarks,
+  getAllMarks,
+  getMarksById,
+  getMarksByStudent,
+  getMyMarks,
   updateMarks,
 } from "../controller/marks.controller.js";
 
@@ -37,11 +41,45 @@ marksRouter.patch(
   updateMarks,
 );
 
-marksRouter.patch(
-  "/update/:marks_id",
+marksRouter.delete(
+  "/delete/:marks_id",
   logInAuth,
   authorizeRoles(admin, super_admin, teacher),
   deleteMarks,
+);
+
+// get all marks for one exam — teacher sees everyone's results
+// marksRouter.get(
+//   "/exam/:exam_id",
+//   logInAuth,
+//   authorizeRoles(admin, super_admin, teacher),
+//   getMarksByExam,
+// );
+
+// get all marks for one student — full history across all exams
+marksRouter.get(
+  "/student/:student_id",
+  logInAuth,
+  authorizeRoles(admin, super_admin, teacher),
+  getMarksByStudent,
+);
+
+// student sees their own marks
+marksRouter.get("/me", logInAuth, authorizeRoles(student), getMyMarks);
+
+// get one specific mark record
+marksRouter.get(
+  "/:marks_id",
+  logInAuth,
+  authorizeRoles(admin, super_admin, teacher),
+  getMarksById,
+);
+// get one specific mark record
+marksRouter.get(
+  "/all/:exam_id",
+  logInAuth,
+  authorizeRoles(admin, super_admin, teacher),
+  getAllMarks,
 );
 
 export default marksRouter;

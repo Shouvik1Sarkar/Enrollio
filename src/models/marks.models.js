@@ -13,11 +13,13 @@ const marksSchema = new mongoose.Schema(
       ref: "Teacher",
       required: true,
     },
+
     exam: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Batch",
+      ref: "Exam",
       required: true,
     },
+
     batch: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Batch", // carries subject, standard, board — no need to repeat

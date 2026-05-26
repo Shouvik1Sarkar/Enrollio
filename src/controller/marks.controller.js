@@ -66,7 +66,7 @@ export const createMarks = asyncHandler(async (req, res) => {
     maxMarks,
     remarks,
     month,
-    teacher: user._id, // fpr now later from the batch
+    teacher: user._id, // for now later from the batch
   });
 
   if (!marks) {
@@ -138,3 +138,66 @@ export const deleteMarks = asyncHandler(async (req, res) => {
 
   return res.status(200).json(new ApiResponse(200, null, "Marks deleted."));
 });
+
+export const getAllMarks = asyncHandler(async (req, res) => {
+  const user = req.user;
+
+  if (!user) {
+    throw new ApiError(403, "User not logged In.");
+  }
+
+  const { exam_id } = req.params;
+
+  const marks = await Marks.find({
+    exam: exam_id,
+  })
+    // .populate("exam", "batch title date totalMarks passingMarks")
+    .populate({
+      path: "student",
+      select: "",
+      populate: {
+        path: "userId",
+        model: "User",
+        select: "name email", // whatever fields are on User
+      },
+    })
+    .populate("exam", "batch title date totalMarks passingMarks")
+    .populate("batch", "name course teacher");
+  // .populate({
+  //   path: "teacher",
+  //   select: "",
+  //   populate: {
+  //     path: "userId",
+  //     model: "User",
+  //     select: "name email", // whatever fields are on User
+  //   },
+  // });
+
+  if (!marks) {
+    throw new ApiError(400, "Marks not found.");
+  }
+
+  return res.status(200).json(new ApiResponse(200, marks, "All Marks."));
+});
+
+export const getMarksByStudent = asyncHandler(async (req, res) => {
+  const user = req.user;
+
+  if (!user) {
+    throw new ApiError(403, "User not logged In.");
+  }
+
+  const { student_id } = req.params;
+
+  const marks = await Marks.find({
+    student: student_id,
+  });
+
+  if (!marks) {
+    throw new ApiError(400, "Marks not found.");
+  }
+
+  return res.status(200).json(new ApiResponse(200, marks, "All Marks."));
+});
+export const getMyMarks = asyncHandler(async (req, res) => {});
+export const getMarksById = asyncHandler(async (req, res) => {});
