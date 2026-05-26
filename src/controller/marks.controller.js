@@ -140,7 +140,7 @@ export const deleteMarks = asyncHandler(async (req, res) => {
   return res.status(200).json(new ApiResponse(200, null, "Marks deleted."));
 });
 
-export const getAllMarks = asyncHandler(async (req, res) => {
+export const getMarksByExam = asyncHandler(async (req, res) => {
   const user = req.user;
 
   if (!user) {

@@ -13,7 +13,7 @@ import { available_user_roles } from "../utils/constants.utils.js";
 import {
   createMarks,
   deleteMarks,
-  getAllMarks,
+  getMarksByExam,
   getMarksById,
   getMarksByStudent,
   getMyMarks,
@@ -48,14 +48,6 @@ marksRouter.delete(
   deleteMarks,
 );
 
-// get all marks for one exam — teacher sees everyone's results
-// marksRouter.get(
-//   "/exam/:exam_id",
-//   logInAuth,
-//   authorizeRoles(admin, super_admin, teacher),
-//   getMarksByExam,
-// );
-
 // get all marks for one student — full history across all exams
 marksRouter.get(
   "/student/:student_id",
@@ -79,7 +71,7 @@ marksRouter.get(
   "/all/:exam_id",
   logInAuth,
   authorizeRoles(admin, super_admin, teacher),
-  getAllMarks,
+  getMarksByExam,
 );
 
 export default marksRouter;
