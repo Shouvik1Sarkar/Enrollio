@@ -64,6 +64,7 @@ salaryRouter.get(
 // );
 
 // delete a wrong salary record
+
 salaryRouter.delete(
   "/:salary_id",
   logInAuth,
