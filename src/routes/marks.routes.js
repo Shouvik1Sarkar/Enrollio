@@ -61,17 +61,18 @@ marksRouter.get("/me", logInAuth, authorizeRoles(student), getMyMarks);
 
 // get one specific mark record
 marksRouter.get(
-  "/:marks_id",
-  logInAuth,
-  authorizeRoles(admin, super_admin, teacher),
-  getMarksById,
-);
-// get one specific mark record
-marksRouter.get(
   "/all/:exam_id",
   logInAuth,
   authorizeRoles(admin, super_admin, teacher),
   getMarksByExam,
+);
+
+// get one specific mark record
+marksRouter.get(
+  "/:marks_id",
+  logInAuth,
+  authorizeRoles(admin, super_admin, teacher),
+  getMarksById,
 );
 
 export default marksRouter;
