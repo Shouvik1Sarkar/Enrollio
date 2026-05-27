@@ -36,3 +36,14 @@ const learning_modes = {
 };
 
 export const learning_modes_enum = Object.values(learning_modes);
+
+export const available_test_types = {
+  CLASS_TEST: "class_test",
+  MONTHLY_TEST: "monthly_test",
+  FINAL_TEST: "final_exam",
+  MOCK_TEST: "mock_test",
+};
+
+export const test_types_enum = Object.values(available_test_types);
+
+// ["class_test", "monthly_test", "final_exam", "mock_test"]

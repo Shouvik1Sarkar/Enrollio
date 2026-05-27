@@ -12,6 +12,7 @@ import {
 } from "../controller/batch.controller.js";
 import authorizeRoles from "../middleware/authorizeRoles.middleware.js";
 import { available_user_roles } from "../utils/constants.utils.js";
+import { removeTeacherFromBatch } from "../controller/teacher.controller.js";
 
 const batchRouter = Router();
 
@@ -68,4 +69,10 @@ batchRouter.delete(
   deleteBatch,
 );
 
+batchRouter.delete(
+  "/teacher/:batch_id/remove/:teacher_id",
+  logInAuth,
+  authorizeRoles(admin, super_admin, teacher),
+  removeTeacherFromBatch,
+); // remove student from batch
 export default batchRouter;

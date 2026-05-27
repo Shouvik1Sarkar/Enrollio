@@ -130,7 +130,9 @@ export const getBatchById = asyncHandler(async (req, res) => {
         model: "User",
         select: "name email",
       },
-    });
+    })
+    .populate("course", "name")
+    .populate("createdBy", "name userName role");
 
   if (!batch) {
     throw new ApiError(400, "Batch not found");

@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { test_types_enum } from "../utils/constants.utils.js";
 const examSchema = new mongoose.Schema(
   {
     batch: {
@@ -17,6 +18,11 @@ const examSchema = new mongoose.Schema(
       required: true,
     },
 
+    teacher: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Teacher",
+    },
+
     totalMarks: {
       type: Number,
       required: true, // out of how much
@@ -24,6 +30,12 @@ const examSchema = new mongoose.Schema(
 
     passingMarks: {
       type: Number,
+      required: true,
+    },
+
+    testType: {
+      type: String,
+      enum: test_types_enum,
       required: true,
     },
 

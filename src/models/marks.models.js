@@ -8,11 +8,11 @@ const marksSchema = new mongoose.Schema(
       required: true,
     },
 
-    teacher: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Teacher",
-      required: true,
-    },
+    // teacher: {
+    //   type: mongoose.Schema.Types.ObjectId,
+    //   ref: "Teacher",
+    //   required: true,
+    // },
 
     exam: {
       type: mongoose.Schema.Types.ObjectId,
@@ -32,11 +32,11 @@ const marksSchema = new mongoose.Schema(
       trim: true,
     },
 
-    testType: {
-      type: String,
-      enum: ["class_test", "monthly_test", "final_exam", "mock_test"],
-      required: true,
-    },
+    // testType: {
+    //   type: String,
+    //   enum: ["class_test", "monthly_test", "final_exam", "mock_test"],
+    //   required: true,
+    // },
 
     marksObtained: {
       type: Number,
@@ -48,10 +48,10 @@ const marksSchema = new mongoose.Schema(
       required: true, // 45/50 vs 45/100 means very different things
     },
 
-    month: {
-      type: String, // "2025-03" — consistent with salary and remarks
-      required: true,
-    },
+    // month: {
+    //   type: String, // "2025-03" — consistent with salary and remarks
+    //   required: true,
+    // },
 
     remarks: {
       type: String, // optional short note from teacher on this test

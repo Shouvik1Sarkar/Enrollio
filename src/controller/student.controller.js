@@ -54,10 +54,9 @@ export const getAllStudents = asyncHandler(async (req, res) => {
     throw new ApiError(403, "Student can not set up.");
   }
 
-  const all_students = await Student.find().populate(
-    "userId",
-    "name userName email isActive role avatar",
-  );
+  const all_students = await Student.find()
+    .populate("userId", "name userName email isActive role avatar")
+    .populate("enrolledBatches", "name course teacher learningMode");
 
   return res
     .status(200)

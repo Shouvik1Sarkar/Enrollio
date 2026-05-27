@@ -134,49 +134,37 @@ export const getMyBatches = asyncHandler(async (req, res) => {
 
 export const assignTeacherToBatch = asyncHandler(async (req, res) => {
   const user = req.user;
+  if (!user) throw new ApiError(401, "User not logged in.");
 
-  if (!user) {
-    throw new ApiError(404, "User not found.");
-  }
-
-  // teacher;
-
-  const { batchName } = req.body;
   const { teacher_id } = req.params;
+  const { batchName } = req.body;
+  const { note } = req.body || undefined;
 
-  if (!batchName) {
-    throw new ApiError(400, "Batch name not found.");
-  }
+  if (!batchName) throw new ApiError(400, "Batch name is required.");
 
-  const batch = await Batch.findOne({
-    name: batchName,
-  });
+  const batch = await Batch.findOne({ name: batchName });
+  if (!batch) throw new ApiError(404, "Batch not found.");
 
-  if (!batch) {
-    throw new ApiError(403, "Batch not found.");
-  }
+  const teacher = await Teacher.findById(teacher_id);
+  if (!teacher) throw new ApiError(404, "Teacher not found.");
 
-  const teacher = await Teacher.findByIdAndUpdate(
-    teacher_id,
-    {
-      $push: {
-        enrolledBatches: batch._id,
-      },
-    },
-
-    { new: true, runValidators: true },
+  // check not already assigned to this batch
+  const alreadyAssigned = teacher.enrolledBatches.some(
+    (id) => id.toString() === batch._id.toString(),
   );
-  if (!teacher) {
-    throw new ApiError(403, "teacher not found.");
-  }
+  if (alreadyAssigned)
+    throw new ApiError(409, "Teacher already assigned to this batch.");
+
+  // update both sides
+  teacher.enrolledBatches.push(batch._id);
+  await teacher.save({ validateBeforeSave: false });
 
   batch.teacher = teacher_id;
-
-  await batch.save();
+  await batch.save({ validateBeforeSave: false });
 
   return res
     .status(200)
-    .json(new ApiResponse(200, teacher, "Teacher enrolled in batch."));
+    .json(new ApiResponse(200, null, "Teacher assigned to batch."));
 });
 
 export const getTeacherById = asyncHandler(async (req, res) => {
@@ -243,4 +231,35 @@ export const deleteTeacher = asyncHandler(async (req, res) => {
   await User.findByIdAndDelete(teacher.userId);
 
   return res.status(200).json(new ApiResponse(200, null, "Teacher deleted."));
+});
+
+export const removeTeacherFromBatch = asyncHandler(async (req, res) => {
+  const myUser = req.user;
+  if (!myUser) throw new ApiError(401, "User not logged in.");
+
+  const { teacher_id, batch_id } = req.params;
+
+  const teacher = await Teacher.findById(teacher_id);
+  if (!teacher) throw new ApiError(404, "Teacher not found.");
+
+  const batch = await Batch.findById(batch_id);
+  if (!batch) throw new ApiError(404, "Batch not found.");
+
+  // check teacher is actually assigned to this batch
+  if (!batch.teacher || batch.teacher.toString() !== teacher._id.toString()) {
+    throw new ApiError(400, "Teacher is not assigned to this batch.");
+  }
+
+  batch.teacher = null;
+  await batch.save({ validateBeforeSave: false });
+
+  await Teacher.findByIdAndUpdate(teacher_id, {
+    $pull: { enrolledBatches: batch._id },
+  });
+
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(200, null, "Teacher removed from batch successfully."),
+    );
 });
