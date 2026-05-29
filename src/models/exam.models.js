@@ -36,7 +36,7 @@ const examSchema = new mongoose.Schema(
     testType: {
       type: String,
       enum: test_types_enum,
-      required: true,
+      // required: true,
     },
 
     createdBy: {

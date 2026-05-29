@@ -1,4 +1,6 @@
 import Batch from "../models/batch.models.js";
+import Marks from "../models/marks.models.js";
+import Salary from "../models/salary.models.js";
 import Student from "../models/student.models.js";
 import User from "../models/user.models.js";
 import ApiError from "../utils/ApiError.utils.js";
@@ -265,4 +267,76 @@ export const removeStudentFromBatch = asyncHandler(async (req, res) => {
     .json(
       new ApiResponse(200, null, "Student removed from batch successfully"),
     );
+});
+
+export const getMe = asyncHandler(async (req, res) => {
+  const user = req.user;
+
+  if (!user) {
+    throw new ApiError(400, "Student not logged In.");
+  }
+
+  if (user.role !== available_user_roles.STUDENT) {
+    throw new ApiError(400, "Only Student.");
+  }
+
+  const findUser = await Student.findOne({
+    userId: user._id,
+  }).populate("userId", "name userName email avatar role isActive");
+
+  if (!findUser) {
+    throw new ApiError(400, "User not found.");
+  }
+
+  return res.status(200).json(new ApiResponse(200, findUser, "ME."));
+});
+
+export const my_fees = asyncHandler(async (req, res) => {
+  const user = req.user;
+
+  if (!user) {
+    throw new ApiError(400, "Student not logged In.");
+  }
+
+  if (user.role !== available_user_roles.STUDENT) {
+    throw new ApiError(400, "Only Student.");
+  }
+
+  const student = await Student.findOne({ userId: user._id }).populate(
+    "feeHistory.batch",
+    "name monthlyFees",
+  ); // populate batch name inside feeHistory
+  // .select("feeHistory total_fees");
+
+  if (!student) throw new ApiError(404, "Student not found.");
+
+  return res.status(200).json(
+    new ApiResponse(
+      200,
+      {
+        total_fees: student.total_fees,
+        feeHistory: student.feeHistory,
+      },
+      "My fees.",
+    ),
+  );
+});
+
+export const my_marks = asyncHandler(async (req, res) => {
+  const user = req.user;
+
+  if (!user) {
+    throw new ApiError(400, "Student not logged In.");
+  }
+
+  if (user.role !== available_user_roles.STUDENT) {
+    throw new ApiError(400, "Only Student.");
+  }
+
+  const student = await Student.findOne({ userId: user._id });
+  if (!student) throw new ApiError(404, "Student not found.");
+
+  const marks = await Marks.find({ student: student._id });
+
+  return res.status(200).json(new ApiResponse(200, marks, "My Marks."));
 });

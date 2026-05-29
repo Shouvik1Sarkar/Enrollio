@@ -4,7 +4,10 @@ import { logInAuth } from "../middleware/logInAuth.middleware.js";
 import {
   enrollStudentInBatch,
   getAllStudents,
+  getMe,
   getStudentById,
+  my_fees,
+  my_marks,
   removeStudentFromBatch,
   setupStudentProfile,
   updateStudentProfile,
@@ -19,6 +22,9 @@ const super_admin = available_user_roles.SUPER_ADMIN;
 const teacher = available_user_roles.TEACHER;
 const student = available_user_roles.STUDENT;
 
+studentRouter.get("/getme", logInAuth, authorizeRoles(student), getMe);
+studentRouter.get("/my-fees", logInAuth, authorizeRoles(student), my_fees);
+studentRouter.get("/my-marks", logInAuth, authorizeRoles(student), my_marks);
 // PROFILE
 studentRouter.post(
   "/setup/:userId",
@@ -65,5 +71,7 @@ studentRouter.delete(
   authorizeRoles(admin, super_admin, teacher),
   removeStudentFromBatch,
 );
+
+// Get Me
 
 export default studentRouter;
