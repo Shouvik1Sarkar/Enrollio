@@ -206,7 +206,7 @@ export const updateBatch = asyncHandler(async (req, res) => {
 export const deleteBatch = asyncHandler(async (req, res) => {
   const user = req.user;
 
-  console.log("USER->", user);
+  // console.log("USER->", user);
 
   const myUser = await User.findById(user._id);
   // console.log("MY USER->", myUser);

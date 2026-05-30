@@ -30,7 +30,7 @@ export const set_salary = asyncHandler(async (req, res) => {
     teacher = await Teacher.findOne({
       userId: get_user._id,
     });
-    console.log("SALARY: ", teacher);
+    // console.log("SALARY: ", teacher);
     if (!teacher) {
       throw new ApiError(400, "Teacher not found.");
     }
