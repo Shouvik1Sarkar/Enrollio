@@ -204,12 +204,15 @@ export const updateBatch = asyncHandler(async (req, res) => {
 });
 
 export const deleteBatch = asyncHandler(async (req, res) => {
-  const user = req.user;
+  const myUser = req.user;
 
   // console.log("USER->", user);
-
-  const myUser = await User.findById(user._id);
+  // const myUser = await User.findById(user._id);
   // console.log("MY USER->", myUser);
+
+  if (!myUser) {
+    throw new ApiError(400, "User not logged In.");
+  }
 
   if (myUser.role !== available_user_roles.SUPER_ADMIN) {
     throw new ApiError(403, "Only Super Amin can delete batches.");
@@ -227,9 +230,9 @@ export const deleteBatch = asyncHandler(async (req, res) => {
 });
 
 export const removeStudent = asyncHandler(async (req, res) => {
-  const user = req.user;
+  const myUser = req.user;
 
-  const myUser = await User.findById(user._id);
+  // const myUser = await User.findById(user._id);
 
   if (!myUser) {
     throw new ApiError(400, "User not logged in.");
@@ -282,9 +285,9 @@ export const removeStudent = asyncHandler(async (req, res) => {
 });
 
 export const allStudentsOfBatch = asyncHandler(async (req, res) => {
-  const user = req.user;
+  const myUser = req.user;
 
-  const myUser = await User.findById(user._id);
+  // const myUser = await User.findById(user._id);
 
   if (!myUser) {
     throw new ApiError(400, "User not logged in.");

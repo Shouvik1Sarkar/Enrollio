@@ -328,6 +328,15 @@ export const getStudentBalance = asyncHandler(async (req, res) => {
 // });
 
 export const deleteFeeRecord = asyncHandler(async (req, res) => {
+  const user = req.user;
+  if (!user) {
+    throw new ApiError(400, "User not logged In.");
+  }
+
+  if (user.role !== "admin" || user.role !== "super_admin") {
+    throw new ApiError(400, "Only admin or super admin can delete.");
+  }
+
   const { student_id, fee_id } = req.params;
 
   const student = await Student.findById(student_id);

@@ -386,14 +386,7 @@ export const setForgetPassword = asyncHandler(async (req, res) => {
 export const changePassword = asyncHandler(async (req, res) => {
   const { password, newPassword, confirmNewPassword } = req.body;
 
-  const user = req.user;
-  if (!user) {
-    throw new ApiError(400, "User not logged In.");
-  }
-
-  const userId = req.user?._id;
-
-  const findUser = await User.findById(userId);
+  const findUser = req.user;
 
   if (!findUser) {
     throw new ApiError(404, "User not found.");

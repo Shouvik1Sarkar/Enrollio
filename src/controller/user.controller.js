@@ -102,6 +102,10 @@ export const updateUser = asyncHandler(async (req, res) => {
 export const deleteUser = asyncHandler(async (req, res) => {
   const loggedInUser = req.user;
 
+  if (!loggedInUser) {
+    throw new ApiError(400, "User not logged in.");
+  }
+
   // only super admin can delete users
   if (loggedInUser.role !== available_user_roles.SUPER_ADMIN) {
     throw new ApiError(403, "Only super admin can delete users");
