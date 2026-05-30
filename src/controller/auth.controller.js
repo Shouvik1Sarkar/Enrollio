@@ -31,7 +31,7 @@ export const createFirstUser = asyncHandler(async (req, res) => {
   // });
 
   // if (superAdminExists) {
-  //   throw new ApiError(403, "Super admin already exists");
+  //   throw new ApiError(409, "Super admin already exists");
   // }
 
   const existedUser = await User.findOne({
@@ -75,7 +75,11 @@ export const createFirstUser = asyncHandler(async (req, res) => {
   return res
     .status(201)
     .json(
-      new ApiResponse(201, createdUser, "Super admin created successfully"),
+      new ApiResponse(
+        201,
+        createdUser,
+        "Super admin created successfully. Verification OTP sent.",
+      ),
     );
 });
 
@@ -93,7 +97,7 @@ export const sendEmailVerificationOTP = asyncHandler(async (req, res) => {
   }
 
   if (user.isEmailVerified) {
-    throw new ApiError(400, "Email is already verified");
+    throw new ApiError(409, "Email is already verified");
   }
 
   const num = user.generateOTP();
@@ -253,7 +257,7 @@ export const logInUser = asyncHandler(async (req, res) => {
   });
 
   if (!user) {
-    throw new ApiError(404, "User does not exist.");
+    throw new ApiError(401, "Invalid credentials");
   }
   if (!user.isEmailVerified) {
     throw new ApiError(403, "Please verify your email before logging in");
@@ -369,7 +373,7 @@ export const setForgetPassword = asyncHandler(async (req, res) => {
   });
 
   if (!findUser) {
-    throw new ApiError(404, "User not found.");
+    throw new ApiError(400, "Invalid or expired OTP.");
   }
 
   findUser.password = newPassword;
@@ -389,7 +393,7 @@ export const changePassword = asyncHandler(async (req, res) => {
   const findUser = req.user;
 
   if (!findUser) {
-    throw new ApiError(404, "User not found.");
+    throw new ApiError(401, "Authentication required.");
   }
   const isPassword = findUser.matchPassword(password);
 

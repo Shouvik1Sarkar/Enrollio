@@ -11,7 +11,7 @@ import asyncHandler from "../utils/asyncHandler.utils.js";
 export const set_salary = asyncHandler(async (req, res) => {
   const user = req.user;
   if (!user) {
-    throw new ApiError(403, "User not logged In.");
+    throw new ApiError(401, "User not logged in.");
   }
 
   //   const { note } = req.body;
@@ -21,7 +21,7 @@ export const set_salary = asyncHandler(async (req, res) => {
   const get_user = await User.findById(user_id);
 
   if (!get_user) {
-    throw new ApiError(400, "User not found.");
+    throw new ApiError(404, "User not found.");
   }
   let teacher;
   let admin;
@@ -32,7 +32,7 @@ export const set_salary = asyncHandler(async (req, res) => {
     });
     // console.log("SALARY: ", teacher);
     if (!teacher) {
-      throw new ApiError(400, "Teacher not found.");
+      throw new ApiError(404, "Teacher not found.");
     }
     if (!teacher.salary)
       throw new ApiError(400, "Teacher has no base salary set. Set it first.");
@@ -41,7 +41,9 @@ export const set_salary = asyncHandler(async (req, res) => {
       userId: get_user._id,
     });
     if (!admin) {
-      throw new ApiError(400, "Teacher not found.");
+      if (!admin) {
+        throw new ApiError(404, "Admin not found.");
+      }
     }
   }
 
@@ -61,16 +63,15 @@ export const set_salary = asyncHandler(async (req, res) => {
   });
 
   if (!salary) {
-    throw new ApiError(400, "Salary not created.");
+    throw new ApiError(500, "Salary not created.");
   }
-
   return res.status(200).json(new ApiResponse(200, salary, "Salary created."));
 });
 
 export const paid_salary = asyncHandler(async (req, res) => {
   const user = req.user;
   if (!user) {
-    throw new ApiError(403, "User not logged In.");
+    throw new ApiError(401, "User not logged in.");
   }
 
   const { user_id } = req.params;
@@ -78,7 +79,7 @@ export const paid_salary = asyncHandler(async (req, res) => {
   const get_user = await User.findById(user_id);
 
   if (!get_user) {
-    throw new ApiError(400, "User not found.");
+    throw new ApiError(404, "User not found.");
   }
 
   let teacher;
@@ -88,14 +89,14 @@ export const paid_salary = asyncHandler(async (req, res) => {
       userId: get_user._id,
     });
     if (!teacher) {
-      throw new ApiError(401, "Teacher not found");
+      throw new ApiError(404, "Teacher not found");
     }
   } else if (get_user.role === "admin") {
     admin = await Admin.findOne({
       userId: get_user._id,
     });
     if (!admin) {
-      throw new ApiError(401, "Admin not found");
+      throw new ApiError(404, "Admin not found");
     }
   }
 
@@ -104,11 +105,11 @@ export const paid_salary = asyncHandler(async (req, res) => {
   const salary = await Salary.findOne({ user: user_id });
 
   if (!salary) {
-    throw new ApiError(400, "salary not found");
+    throw new ApiError(404, "Salary not found");
   }
 
   if (salary.status === "paid") {
-    throw new ApiError(400, "salary already paid");
+    throw new ApiError(409, "Salary already paid");
   }
 
   salary.status = "paid";
@@ -129,7 +130,7 @@ export const paid_salary = asyncHandler(async (req, res) => {
 export const salary_history = asyncHandler(async (req, res) => {
   const user = req.user;
   if (!user) {
-    throw new ApiError(403, "User not logged In.");
+    throw new ApiError(401, "User not logged in.");
   }
 
   const { user_id } = req.params;
@@ -137,19 +138,33 @@ export const salary_history = asyncHandler(async (req, res) => {
   const get_user = await User.findById(user_id);
 
   if (!get_user) {
-    throw new ApiError(400, "User not found.");
+    throw new ApiError(404, "User not found.");
   }
 
-  if (!["teacher", "admin"].includes(get_user.role)) {
-    throw new ApiError(400, "User is not a teacher or admin.");
-  }
+  // if (!["teacher", "admin"].includes(get_user.role)) {
+  //   throw new ApiError(403, "User is not a teacher or admin.");
+  // }
 
-  const teacher = await Teacher.findOne({
-    userId: user_id,
-  });
+  // const teacher = await Teacher.findOne({
+  //   userId: user_id,
+  // });
 
-  if (!teacher) {
-    throw new ApiError(400, "Teacher not found.");
+  // if (!teacher) {
+  //   throw new ApiError(404, "Teacher not found.");
+  // }
+
+  if (get_user.role === "teacher") {
+    const teacher = await Teacher.findOne({ userId: user_id });
+
+    if (!teacher) {
+      throw new ApiError(404, "Teacher not found.");
+    }
+  } else {
+    const admin = await Admin.findOne({ userId: user_id });
+
+    if (!admin) {
+      throw new ApiError(404, "Admin not found.");
+    }
   }
 
   const salaryHistory = await Salary.find({
@@ -189,17 +204,17 @@ export const getAllSalaries = asyncHandler(async (req, res) => {
   const user = req.user;
 
   if (!user) {
-    throw new ApiError(403, "User not logged In.");
+    throw new ApiError(401, "User not logged in.");
   }
 
   if (!["super_admin", "admin"].includes(user.role)) {
-    throw new ApiError(400, "User is not a teacher or admin.");
+    throw new ApiError(403, "Only admins can view salaries.");
   }
 
   const salaries = await Salary.find();
-  if (!salaries) {
-    throw new ApiError(400, "Salaries found.");
-  }
+  // if (!salaries) {
+  //   throw new ApiError(400, "Salaries found.");
+  // }
 
   return res.status(200).json(new ApiResponse(200, salaries, "Salary found."));
 });
@@ -208,11 +223,14 @@ export const deleteSalaryRecord = asyncHandler(async (req, res) => {
   const user = req.user;
 
   if (!user) {
-    throw new ApiError(403, "User not logged In.");
+    throw new ApiError(401, "User not logged in.");
   }
 
   if (!["super_admin", "admin"].includes(user.role)) {
-    throw new ApiError(400, "User is not a teacher or admin.");
+    throw new ApiError(
+      403,
+      "Only admin or super admin can delete salary records.",
+    );
   }
 
   const { month } = req.params;

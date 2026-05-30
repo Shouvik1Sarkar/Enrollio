@@ -13,11 +13,11 @@ export const setupTeacherProfile = asyncHandler(async (req, res) => {
   // const myUser = await User.findById(user._id);
 
   if (!myUser) {
-    throw new ApiError(400, "User not logged in.");
+    throw new ApiError(401, "Authentication required.");
   }
 
   if (myUser.role !== available_user_roles.SUPER_ADMIN) {
-    throw new ApiError(403, "Only Super admin can set up a teacher.");
+    throw new ApiError(403, "Only Super Admins can create teacher profiles.");
   }
 
   const { education, experience, subjects, salary } = req.body;
@@ -27,7 +27,7 @@ export const setupTeacherProfile = asyncHandler(async (req, res) => {
   const userTeacher = await User.findById(userId);
 
   if (!userTeacher) {
-    throw new ApiError(400, "User not found.");
+    throw new ApiError(404, "User not found.");
   }
 
   const teacher = await Teacher.create({
@@ -40,7 +40,7 @@ export const setupTeacherProfile = asyncHandler(async (req, res) => {
   });
 
   if (!teacher) {
-    throw new ApiError(400, "TEACHER NOT CREATED.");
+    throw new ApiError(500, "Failed to create teacher profile.");
   }
 
   return res
@@ -52,11 +52,11 @@ export const updateTeacher = asyncHandler(async (req, res) => {
   const myUser = req.user;
 
   if (!myUser) {
-    throw new ApiError(400, "User not logged in.");
+    throw new ApiError(401, "Authentication required.");
   }
 
   if (myUser.role !== available_user_roles.SUPER_ADMIN) {
-    throw new ApiError(403, "Only Super admin can set up a teacher.");
+    throw new ApiError(403, "Only Super Admins can update teacher profiles.");
   }
 
   const { education, experience, subjects, salary } = req.body;
@@ -79,7 +79,7 @@ export const updateTeacher = asyncHandler(async (req, res) => {
   );
 
   if (!userTeacher) {
-    throw new ApiError(400, "User not found.");
+    throw new ApiError(404, "Teacher not found.");
   }
 
   return res
@@ -92,7 +92,7 @@ export const updateTeacher = asyncHandler(async (req, res) => {
 export const updateSalary = asyncHandler(async (req, res) => {
   const user = req.user;
   if (!user) {
-    throw new ApiError(400, "User Logged In---------");
+    throw new ApiError(401, "Authentication required.");
   }
 
   const { teacher_id } = req.params;
@@ -101,11 +101,10 @@ export const updateSalary = asyncHandler(async (req, res) => {
   if (!salary || salary <= 0) {
     throw new ApiError(400, "Valid salary amount is required.");
   }
-
   const teacher = await Teacher.findById(teacher_id);
 
   if (!teacher) {
-    throw new ApiError(400, "User not found.");
+    throw new ApiError(404, "Teacher not found.");
   }
   teacher.salary = salary;
   await teacher.save({ validateBeforeSave: false });
@@ -118,13 +117,13 @@ export const getMyBatches = asyncHandler(async (req, res) => {
   const user = req.user;
 
   if (!user) {
-    throw new ApiError(404, "User not found.");
+    throw new ApiError(401, "Authentication required.");
   }
 
   const batch = await Teacher.findOne({ userId: user._id });
 
   if (!batch) {
-    throw new ApiError(400, "Batch not found.");
+    throw new ApiError(404, "Batch not found.");
   }
 
   return res
@@ -134,7 +133,9 @@ export const getMyBatches = asyncHandler(async (req, res) => {
 
 export const assignTeacherToBatch = asyncHandler(async (req, res) => {
   const user = req.user;
-  if (!user) throw new ApiError(401, "User not logged in.");
+  if (!user) {
+    throw new ApiError(401, "Authentication required.");
+  }
 
   const { teacher_id } = req.params;
   const { batchName } = req.body;
@@ -143,17 +144,22 @@ export const assignTeacherToBatch = asyncHandler(async (req, res) => {
   if (!batchName) throw new ApiError(400, "Batch name is required.");
 
   const batch = await Batch.findOne({ name: batchName });
-  if (!batch) throw new ApiError(404, "Batch not found.");
+  if (!batch) {
+    throw new ApiError(404, "Batch not found.");
+  }
 
   const teacher = await Teacher.findById(teacher_id);
-  if (!teacher) throw new ApiError(404, "Teacher not found.");
+  if (!teacher) {
+    throw new ApiError(404, "Teacher not found.");
+  }
 
   // check not already assigned to this batch
   const alreadyAssigned = teacher.enrolledBatches.some(
     (id) => id.toString() === batch._id.toString(),
   );
-  if (alreadyAssigned)
-    throw new ApiError(409, "Teacher already assigned to this batch.");
+  if (alreadyAssigned) {
+    throw new ApiError(409, "Teacher is already assigned to this batch.");
+  }
 
   // update both sides
   teacher.enrolledBatches.push(batch._id);
@@ -171,7 +177,7 @@ export const getTeacherById = asyncHandler(async (req, res) => {
   const user = req.user;
 
   if (!user) {
-    throw new ApiError(404, "User not found.");
+    throw new ApiError(401, "Authentication required.");
   }
 
   const { teacher_id } = req.params;
@@ -181,12 +187,16 @@ export const getTeacherById = asyncHandler(async (req, res) => {
     .populate("enrolledBatches", "name");
 
   if (!teacher) {
-    throw new ApiError(404, "Tacher not found");
+    throw new ApiError(404, "Teacher not found.");
   }
 
   const salary = await Salary.findOne({
     user: teacher.userId,
   });
+
+  if (!salary) {
+    throw new ApiError(404, "Salary not found.");
+  }
 
   return res
     .status(200)
@@ -207,11 +217,11 @@ export const getTeacherById = asyncHandler(async (req, res) => {
 export const deleteTeacher = asyncHandler(async (req, res) => {
   const user = req.user;
   if (!user) {
-    throw new ApiError(400, "User Logged In---------");
+    throw new ApiError(401, "Authentication required.");
   }
 
   if (user.role !== "super_admin") {
-    throw new ApiError(400, "Only Super can delete a Teacher.");
+    throw new ApiError(403, "Only Super Admins can delete teachers.");
   }
 
   const { teacher_id } = req.params;
@@ -219,14 +229,13 @@ export const deleteTeacher = asyncHandler(async (req, res) => {
   const teacher = await Teacher.findById(teacher_id);
 
   if (!teacher) {
-    throw new ApiError(400, "User not found.");
+    throw new ApiError(404, "Teacher not found.");
   }
 
   const getUser = await User.findById(teacher.userId);
   if (!getUser) {
-    throw new ApiError(400, "User not found.");
+    throw new ApiError(404, "Associated user not found.");
   }
-
   await Teacher.findByIdAndDelete(teacher_id);
   await User.findByIdAndDelete(teacher.userId);
 
@@ -235,19 +244,25 @@ export const deleteTeacher = asyncHandler(async (req, res) => {
 
 export const removeTeacherFromBatch = asyncHandler(async (req, res) => {
   const myUser = req.user;
-  if (!myUser) throw new ApiError(401, "User not logged in.");
+  if (!myUser) {
+    throw new ApiError(401, "Authentication required.");
+  }
 
   const { teacher_id, batch_id } = req.params;
 
   const teacher = await Teacher.findById(teacher_id);
-  if (!teacher) throw new ApiError(404, "Teacher not found.");
+  if (!teacher) {
+    throw new ApiError(404, "Teacher not found.");
+  }
 
   const batch = await Batch.findById(batch_id);
-  if (!batch) throw new ApiError(404, "Batch not found.");
+  if (!batch) {
+    throw new ApiError(404, "Batch not found.");
+  }
 
   // check teacher is actually assigned to this batch
   if (!batch.teacher || batch.teacher.toString() !== teacher._id.toString()) {
-    throw new ApiError(400, "Teacher is not assigned to this batch.");
+    throw new ApiError(409, "Teacher is not assigned to this batch.");
   }
 
   batch.teacher = null;

@@ -12,7 +12,7 @@ export const createMarks = asyncHandler(async (req, res) => {
   const user = req.user;
 
   if (!user) {
-    throw new ApiError(403, "User not logged In.");
+    throw new ApiError(401, "User not logged in.");
   }
 
   const { exam_id, batch_id } = req.params;
@@ -23,13 +23,13 @@ export const createMarks = asyncHandler(async (req, res) => {
   });
 
   if (!exam) {
-    throw new ApiError(400, "Exam not found.");
+    throw new ApiError(404, "Exam not found.");
   }
 
   const batch = await Batch.findById(batch_id);
 
   if (!batch) {
-    throw new ApiError(400, "Batch not found.");
+    throw new ApiError(404, "Batch not found.");
   }
 
   const { user_name, testName, testType, marksObtained, maxMarks, remarks } =
@@ -40,7 +40,7 @@ export const createMarks = asyncHandler(async (req, res) => {
   });
 
   if (!find_user) {
-    throw new ApiError(400, "User not found.");
+    throw new ApiError(404, "User not found.");
   }
 
   const student = await Student.findOne({
@@ -48,7 +48,7 @@ export const createMarks = asyncHandler(async (req, res) => {
   });
 
   if (!student) {
-    throw new ApiError(400, "Student not found.");
+    throw new ApiError(404, "Student not found.");
   }
 
   //   const exam = await Exam.findOne({
@@ -71,9 +71,8 @@ export const createMarks = asyncHandler(async (req, res) => {
   });
 
   if (!marks) {
-    throw new ApiError(400, "Marks not created.");
+    throw new ApiError(500, "Marks not created.");
   }
-
   return res
     .status(201)
     .json(new ApiResponse(201, marks, "Marks not created."));
@@ -92,7 +91,7 @@ export const updateMarks = asyncHandler(async (req, res) => {
   const user = req.user;
 
   if (!user) {
-    throw new ApiError(403, "User not logged In.");
+    throw new ApiError(401, "User not logged in.");
   }
 
   const { marks_id, student_id } = req.params;
@@ -102,12 +101,12 @@ export const updateMarks = asyncHandler(async (req, res) => {
   const marks = await Marks.findById(marks_id);
 
   if (!marks) {
-    throw new ApiError(400, "Marks not found.");
+    throw new ApiError(404, "Marks not found.");
   }
   // console.log("STUDENT: ", marks.student);
   // console.log("student_id: ", student_id);
   if (marks.student != student_id) {
-    throw new ApiError(400, "Studet not matched");
+    throw new ApiError(409, "Student does not match the marks record.");
   }
 
   if (testType) marks.testType = testType;
@@ -124,7 +123,7 @@ export const deleteMarks = asyncHandler(async (req, res) => {
   const user = req.user;
 
   if (!user) {
-    throw new ApiError(403, "User not logged In.");
+    throw new ApiError(401, "User not logged in.");
   }
 
   const { marks_id } = req.params;
@@ -132,7 +131,7 @@ export const deleteMarks = asyncHandler(async (req, res) => {
   const marks = await Marks.findById(marks_id);
 
   if (!marks) {
-    throw new ApiError(400, "Marks not found.");
+    throw new ApiError(404, "Marks not found.");
   }
 
   await marks.deleteOne();
@@ -144,7 +143,7 @@ export const getMarksByExam = asyncHandler(async (req, res) => {
   const user = req.user;
 
   if (!user) {
-    throw new ApiError(403, "User not logged In.");
+    throw new ApiError(401, "User not logged in.");
   }
 
   const { exam_id } = req.params;
@@ -174,9 +173,9 @@ export const getMarksByExam = asyncHandler(async (req, res) => {
   //   },
   // });
 
-  if (!marks) {
-    throw new ApiError(400, "Marks not found.");
-  }
+  // if (!marks) {
+  //   throw new ApiError(400, "Marks not found.");
+  // }
 
   return res.status(200).json(new ApiResponse(200, marks, "All Marks."));
 });
@@ -185,7 +184,7 @@ export const getMarksByStudent = asyncHandler(async (req, res) => {
   const user = req.user;
 
   if (!user) {
-    throw new ApiError(403, "User not logged In.");
+    throw new ApiError(401, "User not logged in.");
   }
 
   const { student_id } = req.params;
@@ -205,20 +204,19 @@ export const getMyMarks = asyncHandler(async (req, res) => {
   const user = req.user;
 
   if (!user) {
-    throw new ApiError(403, "User not logged In.");
+    throw new ApiError(401, "User not logged in.");
   }
 
   if (user.role !== "student") {
-    throw new ApiError(400, "Only student can do this");
+    throw new ApiError(403, "Only students can access their marks.");
   }
-
   const marks = await Marks.find({
     student: user._id,
   });
 
-  if (!marks) {
-    throw new ApiError(400, "Marks not found.");
-  }
+  // if (!marks) {
+  //   throw new ApiError(400, "Marks not found.");
+  // }
 
   return res.status(200).json(new ApiResponse(200, marks, "My Marks."));
 });
@@ -227,9 +225,8 @@ export const getMarksById = asyncHandler(async (req, res) => {
   const user = req.user;
 
   if (!user) {
-    throw new ApiError(403, "User not logged In.");
+    throw new ApiError(401, "User not logged in.");
   }
-
   const { marks_id } = req.params;
 
   const mark = await Marks.findById(marks_id)
@@ -246,7 +243,7 @@ export const getMarksById = asyncHandler(async (req, res) => {
     .populate("batch", "name course teacher");
 
   if (!mark) {
-    throw new ApiError(400, "Marks not found.");
+    throw new ApiError(404, "Marks not found.");
   }
 
   return res.status(200).json(new ApiResponse(200, mark, "My Marks."));

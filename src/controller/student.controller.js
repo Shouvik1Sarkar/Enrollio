@@ -12,21 +12,20 @@ export const setupStudentProfile = asyncHandler(async (req, res) => {
   const myUser = req.user;
 
   if (!myUser) {
-    throw new ApiError(400, "User not logged in.");
+    throw new ApiError(401, "User not logged in.");
   }
 
   if (myUser.role === available_user_roles.STUDENT) {
-    throw new ApiError(403, "Student can not set up.");
+    throw new ApiError(403, "Student cannot set up another student profile.");
   }
 
-  const { studentType, board, standard, stream, createdBy } = req.body;
-
+  const { studentType, board, standard, stream } = req.body;
   const { userId } = req.params;
 
   const userStudent = await User.findById(userId);
 
   if (!userStudent) {
-    throw new ApiError(400, "User not found.");
+    throw new ApiError(404, "User not found.");
   }
 
   const student = await Student.create({
@@ -39,21 +38,25 @@ export const setupStudentProfile = asyncHandler(async (req, res) => {
   });
 
   if (!student) {
-    throw new ApiError(400, "STUDENT NOT CREATED.");
+    throw new ApiError(500, "Failed to create student profile.");
   }
 
-  return res.status(201).json(new ApiResponse(201, student, "Student."));
+  return res
+    .status(201)
+    .json(
+      new ApiResponse(201, student, "Student profile created successfully."),
+    );
 });
 
 export const getAllStudents = asyncHandler(async (req, res) => {
   const myUser = req.user;
 
   if (!myUser) {
-    throw new ApiError(400, "User not logged in.");
+    throw new ApiError(401, "Authentication required.");
   }
 
   if (myUser.role === available_user_roles.STUDENT) {
-    throw new ApiError(403, "Student can not set up.");
+    throw new ApiError(403, "You are not authorized to access this resource.");
   }
 
   const all_students = await Student.find()
@@ -106,7 +109,7 @@ export const enrollStudentInBatch = asyncHandler(async (req, res) => {
   );
 
   if (isAlreadyEnrolled) {
-    throw new ApiError(400, "Student is already enrolled in this batch");
+    throw new ApiError(409, "Student is already enrolled in this batch");
   }
 
   // update both sides cleanly
@@ -142,7 +145,7 @@ export const getStudentById = asyncHandler(async (req, res) => {
   const myUser = req.user;
 
   if (!myUser) {
-    throw new ApiError(400, "User not logged in.");
+    throw new ApiError(401, "Authentication required.");
   }
 
   if (myUser.role === available_user_roles.STUDENT) {
@@ -155,7 +158,7 @@ export const getStudentById = asyncHandler(async (req, res) => {
     .populate("enrolledBatches", "name course teacher learningMode");
 
   if (!student) {
-    throw new ApiError(400, "Student not found.");
+    throw new ApiError(404, "Student not found.");
   }
 
   return res.status(200).json(new ApiResponse(200, student, "Student."));
@@ -165,11 +168,14 @@ export const updateStudentProfile = asyncHandler(async (req, res) => {
   const myUser = req.user;
 
   if (!myUser) {
-    throw new ApiError(400, "User not logged in.");
+    throw new ApiError(401, "Authentication required.");
   }
 
   if (myUser.role === available_user_roles.STUDENT) {
-    throw new ApiError(403, "Student can not set up.");
+    throw new ApiError(
+      403,
+      "Students are not authorized to update student profiles.",
+    );
   }
 
   const { studentType, board, standard, stream } = req.body;
@@ -185,7 +191,7 @@ export const updateStudentProfile = asyncHandler(async (req, res) => {
   const student = await Student.findById(student_id);
 
   if (!student) {
-    throw new ApiError(400, "Student not found");
+    throw new ApiError(404, "Student not found.");
   }
 
   const updated_student = await Student.findByIdAndUpdate(
@@ -200,7 +206,7 @@ export const updateStudentProfile = asyncHandler(async (req, res) => {
   ).populate("userId", "name userName email isActive role avatar");
 
   if (!updated_student) {
-    throw new ApiError(403, "failed to update.");
+    throw new ApiError(500, "Failed to update student profile.");
   }
 
   return res
@@ -211,28 +217,32 @@ export const updateStudentProfile = asyncHandler(async (req, res) => {
 export const removeStudentFromBatch = asyncHandler(async (req, res) => {
   const myUser = req.user;
   if (!myUser) {
-    throw new ApiError(401, "User not logged in.");
+    throw new ApiError(401, "Authentication required.");
   }
   if (myUser.role === available_user_roles.STUDENT) {
     throw new ApiError(
       403,
-      "Students cannot remove other students from batches",
+      "Students cannot remove other students from batches.",
     );
   }
 
   const { student_id, batch_id } = req.params;
 
   const student = await Student.findById(student_id);
-  if (!student) throw new ApiError(404, "Student not found");
+  if (!student) {
+    throw new ApiError(404, "Student not found.");
+  }
 
   const batch = await Batch.findById(batch_id);
-  if (!batch) throw new ApiError(404, "Batch not found");
+  if (!batch) {
+    throw new ApiError(404, "Batch not found.");
+  }
 
   // check student is actually in this batch
   const isEnrolled = batch.students.some((id) => id.toString() === student_id);
 
   if (!isEnrolled) {
-    throw new ApiError(400, "Student is not enrolled in this batch");
+    throw new ApiError(409, "Student is not enrolled in this batch.");
   }
 
   // check for unpaid fees
@@ -256,6 +266,10 @@ export const removeStudentFromBatch = asyncHandler(async (req, res) => {
 
   const updatedStudent = await Student.findById(student_id);
 
+  if (!updatedStudent) {
+    throw new ApiError(500, "Failed to update student enrollment.");
+  }
+
   updatedStudent.feeHistory = updatedStudent.feeHistory.filter(
     (record) => record.batch.toString() !== batch_id.toString(),
   );
@@ -273,11 +287,11 @@ export const getMe = asyncHandler(async (req, res) => {
   const user = req.user;
 
   if (!user) {
-    throw new ApiError(400, "Student not logged In.");
+    throw new ApiError(401, "Authentication required.");
   }
 
   if (user.role !== available_user_roles.STUDENT) {
-    throw new ApiError(400, "Only Student.");
+    throw new ApiError(403, "Only students can access this resource.");
   }
 
   const findUser = await Student.findOne({
@@ -285,7 +299,7 @@ export const getMe = asyncHandler(async (req, res) => {
   }).populate("userId", "name userName email avatar role isActive");
 
   if (!findUser) {
-    throw new ApiError(400, "User not found.");
+    throw new ApiError(404, "Student profile not found.");
   }
 
   return res.status(200).json(new ApiResponse(200, findUser, "ME."));
@@ -295,11 +309,11 @@ export const my_fees = asyncHandler(async (req, res) => {
   const user = req.user;
 
   if (!user) {
-    throw new ApiError(400, "Student not logged In.");
+    throw new ApiError(401, "Authentication required.");
   }
 
   if (user.role !== available_user_roles.STUDENT) {
-    throw new ApiError(400, "Only Student.");
+    throw new ApiError(403, "Only students can access this resource.");
   }
 
   const student = await Student.findOne({ userId: user._id }).populate(
@@ -308,7 +322,9 @@ export const my_fees = asyncHandler(async (req, res) => {
   ); // populate batch name inside feeHistory
   // .select("feeHistory total_fees");
 
-  if (!student) throw new ApiError(404, "Student not found.");
+  if (!student) {
+    throw new ApiError(404, "Student not found.");
+  }
 
   return res.status(200).json(
     new ApiResponse(
@@ -326,15 +342,17 @@ export const my_marks = asyncHandler(async (req, res) => {
   const user = req.user;
 
   if (!user) {
-    throw new ApiError(400, "Student not logged In.");
+    throw new ApiError(401, "Authentication required.");
   }
 
   if (user.role !== available_user_roles.STUDENT) {
-    throw new ApiError(400, "Only Student.");
+    throw new ApiError(403, "Only students can access this resource.");
   }
 
   const student = await Student.findOne({ userId: user._id });
-  if (!student) throw new ApiError(404, "Student not found.");
+  if (!student) {
+    throw new ApiError(404, "Student not found.");
+  }
 
   const marks = await Marks.find({ student: student._id });
 

@@ -7,7 +7,7 @@ import asyncHandler from "../utils/asyncHandler.utils.js";
 export const addFeeRecord = asyncHandler(async (req, res) => {
   const user = req.user;
   if (!user) {
-    throw new ApiError(403, "User not Logged In.");
+    throw new ApiError(401, "User not Logged In.");
   }
 
   const { student_id } = req.params;
@@ -20,7 +20,7 @@ export const addFeeRecord = asyncHandler(async (req, res) => {
 
   const student = await Student.findById(student_id);
   if (!student) {
-    throw new ApiError(400, "Student not found.");
+    throw new ApiError(404, "Student not found.");
   }
 
   if (student.enrolledBatches.length == 0) {
@@ -50,7 +50,9 @@ export const addFeeRecord = asyncHandler(async (req, res) => {
     "name monthlyFees",
   ); // ← name shows up here
 
-  if (!student1) throw new ApiError(404, "Student not found.");
+  if (!student1) {
+    throw new ApiError(404, "Student not found.");
+  }
 
   return res
     .status(201)
@@ -60,7 +62,7 @@ export const addFeeRecord = asyncHandler(async (req, res) => {
 export const addSingleFeeRecord = asyncHandler(async (req, res) => {
   const user = req.user;
   if (!user) {
-    throw new ApiError(403, "User not Logged In.");
+    throw new ApiError(401, "User not logged in.");
   }
 
   const { student_id, batch_id } = req.params;
@@ -73,7 +75,7 @@ export const addSingleFeeRecord = asyncHandler(async (req, res) => {
 
   const student = await Student.findById(student_id);
   if (!student) {
-    throw new ApiError(400, "Student not found.");
+    throw new ApiError(404, "Student not found.");
   }
 
   if (student.enrolledBatches.length == 0) {
@@ -82,7 +84,7 @@ export const addSingleFeeRecord = asyncHandler(async (req, res) => {
 
   const batch = await Batch.findById(batch_id);
   if (!batch) {
-    throw new ApiError(400, "Batch not found");
+    throw new ApiError(404, "Batch not found");
   }
 
   const alreadyExists = student.feeHistory.some(
@@ -90,7 +92,7 @@ export const addSingleFeeRecord = asyncHandler(async (req, res) => {
   );
 
   if (alreadyExists) {
-    throw new ApiError(400, "Already exists.");
+    throw new ApiError(409, "Fee record already exists.");
   }
 
   student.feeHistory.push({
@@ -127,7 +129,9 @@ export const addSingleFeeRecord = asyncHandler(async (req, res) => {
     "name monthlyFees",
   ); // ← name shows up here
 
-  if (!student1) throw new ApiError(404, "Student not found.");
+  if (!student1) {
+    throw new ApiError(404, "Student not found.");
+  }
 
   return res
     .status(201)
@@ -137,7 +141,7 @@ export const addSingleFeeRecord = asyncHandler(async (req, res) => {
 export const feeById = asyncHandler(async (req, res) => {
   const user = req.user;
   if (!user) {
-    throw new ApiError(403, "User not logged In.");
+    throw new ApiError(401, "User not logged in.");
   }
 
   const { student_id, fee_id } = req.params;
@@ -147,13 +151,13 @@ export const feeById = asyncHandler(async (req, res) => {
     "name monthlyFees",
   );
   if (!student) {
-    throw new ApiError(400, "Student not found.");
+    throw new ApiError(404, "Student not found.");
   }
 
   const fee = student.feeHistory.id(fee_id);
 
   if (!fee) {
-    throw new ApiError(400, "Fee not found");
+    throw new ApiError(404, "Fee not found");
   }
 
   return res.status(200).json(new ApiResponse(200, fee, "Fee found."));
@@ -194,7 +198,7 @@ export const markEachFeePaid = asyncHandler(async (req, res) => {
   const user = req.user;
 
   if (!user) {
-    throw new ApiError(403, "User not logged In.");
+    throw new ApiError(401, "User not logged in.");
   }
 
   const { student_id, fee_id } = req.params;
@@ -202,16 +206,16 @@ export const markEachFeePaid = asyncHandler(async (req, res) => {
 
   const student = await Student.findById(student_id);
   if (!student) {
-    throw new ApiError(401, "Student not found");
+    throw new ApiError(404, "Student not found");
   }
 
   const fees = await student.feeHistory.id(fee_id);
   if (!fees) {
-    throw new ApiError(400, "Fees Not Found.");
+    throw new ApiError(404, "Fee record not found.");
   }
 
   if (fees.status === "paid") {
-    throw new ApiError(400, "Fees already.");
+    throw new ApiError(409, "Fee is already marked as paid.");
   }
 
   fees.status = "paid";
@@ -227,7 +231,7 @@ export const getStudentFeeHistory = asyncHandler(async (req, res) => {
   const user = req.user;
 
   if (!user) {
-    throw new ApiError(403, "User not logged In.");
+    throw new ApiError(401, "User not logged in.");
   }
 
   const { student_id } = req.params;
@@ -237,7 +241,7 @@ export const getStudentFeeHistory = asyncHandler(async (req, res) => {
     select: "name",
   });
   if (!student) {
-    throw new ApiError(401, "Student not found");
+    throw new ApiError(404, "Student not found");
   }
 
   return res
@@ -249,7 +253,7 @@ export const getStudentBalance = asyncHandler(async (req, res) => {
   const user = req.user;
 
   if (!user) {
-    throw new ApiError(403, "User not logged In.");
+    throw new ApiError(401, "User not logged in.");
   }
 
   const { student_id } = req.params;
@@ -257,7 +261,7 @@ export const getStudentBalance = asyncHandler(async (req, res) => {
   const student = await Student.findById(student_id);
 
   if (!student) {
-    throw new ApiError(401, "Student not found");
+    throw new ApiError(404, "Student not found");
   }
 
   let totalPaid = 0;
@@ -330,11 +334,11 @@ export const getStudentBalance = asyncHandler(async (req, res) => {
 export const deleteFeeRecord = asyncHandler(async (req, res) => {
   const user = req.user;
   if (!user) {
-    throw new ApiError(400, "User not logged In.");
+    throw new ApiError(401, "User not logged in.");
   }
 
-  if (user.role !== "admin" || user.role !== "super_admin") {
-    throw new ApiError(400, "Only admin or super admin can delete.");
+  if (!["admin", "super_admin"].includes(user.role)) {
+    throw new ApiError(403, "Only admin or super admin can delete.");
   }
 
   const { student_id, fee_id } = req.params;

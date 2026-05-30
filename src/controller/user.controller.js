@@ -13,7 +13,7 @@ export const getUser = asyncHandler(async (req, res) => {
   const myUser = req.user;
 
   if (!myUser) {
-    throw new ApiError(401, "User not logged in.");
+    throw new ApiError(401, "Authentication required.");
   }
 
   // const userId = req.user._id;
@@ -46,7 +46,7 @@ export const getUser = asyncHandler(async (req, res) => {
 export const updateUser = asyncHandler(async (req, res) => {
   const myUser = req.user;
   if (!myUser) {
-    throw new ApiError(401, "Not logged in.");
+    throw new ApiError(401, "Authentication required.");
   }
 
   if (myUser.role === available_user_roles.STUDENT) {
@@ -71,7 +71,7 @@ export const updateUser = asyncHandler(async (req, res) => {
   ).select("-password -refreshToken");
 
   if (!updatedUser) {
-    throw new ApiError(400, "Update failed.");
+    throw new ApiError(404, "User not found.");
   }
 
   return res
@@ -103,22 +103,24 @@ export const deleteUser = asyncHandler(async (req, res) => {
   const loggedInUser = req.user;
 
   if (!loggedInUser) {
-    throw new ApiError(400, "User not logged in.");
+    throw new ApiError(401, "Authentication required.");
   }
 
   // only super admin can delete users
   if (loggedInUser.role !== available_user_roles.SUPER_ADMIN) {
-    throw new ApiError(403, "Only super admin can delete users");
+    throw new ApiError(403, "Only Super Admins can delete users.");
   }
 
   const { user_id } = req.params;
 
   const user = await User.findById(user_id);
-  if (!user) throw new ApiError(404, "User not found");
+  if (!user) {
+    throw new ApiError(404, "User not found.");
+  }
 
   // prevent super admin from deleting themselves
   if (user._id.toString() === loggedInUser._id.toString()) {
-    throw new ApiError(400, "You cannot delete yourself");
+    throw new ApiError(409, "You cannot delete your own account.");
   }
 
   // ── STUDENT cleanup ───────────────────────────
@@ -162,7 +164,7 @@ export const deleteUser = asyncHandler(async (req, res) => {
 export const allUsers = asyncHandler(async (req, res) => {
   const myUser = req.user;
   if (!myUser) {
-    throw new ApiError(401, "Not logged in.");
+    throw new ApiError(401, "Authentication required.");
   }
 
   // const userId = req.user?._id;
@@ -197,7 +199,7 @@ export const allUsers = asyncHandler(async (req, res) => {
 export const updateUserRole = asyncHandler(async (req, res) => {
   const myUser = req.user;
   if (!myUser) {
-    throw new ApiError(401, "Not logged in.");
+    throw new ApiError(401, "Authentication required.");
   }
 
   // const userId = req.user?._id;
@@ -209,18 +211,16 @@ export const updateUserRole = asyncHandler(async (req, res) => {
   // }
 
   if (myUser.role !== available_user_roles.SUPER_ADMIN) {
-    throw new ApiError(403, "Only Super Admin can change User role.");
+    throw new ApiError(403, "Only Super Admins can change user roles.");
   }
-
   const { user_id } = req.params;
 
-  if (user_id === userId.toString()) {
-    throw new ApiError(400, "You cannot change your own role.");
+  if (user_id === myUser._id.toString()) {
+    throw new ApiError(409, "You cannot change your own role.");
   }
-
   const { role } = req.body;
 
-  if (!role || !validRoles.includes(user_roles_enum)) {
+  if (!role || !validRoles.includes(role)) {
     throw new ApiError(400, "Invalid role.");
   }
 
@@ -233,7 +233,6 @@ export const updateUserRole = asyncHandler(async (req, res) => {
   if (!change_user) {
     throw new ApiError(404, "User not found.");
   }
-
   return res
     .status(200)
     .json(new ApiResponse(200, change_user, "ROLE updated."));
@@ -244,7 +243,7 @@ export const updateUserRole = asyncHandler(async (req, res) => {
 export const getUserById = asyncHandler(async (req, res) => {
   const myUser = req.user;
   if (!myUser) {
-    throw new ApiError(401, "Not logged in.");
+    throw new ApiError(401, "Authentication required.");
   }
 
   // const userId = req.user?._id;
@@ -259,19 +258,22 @@ export const getUserById = asyncHandler(async (req, res) => {
     myUser.role === available_user_roles.STUDENT ||
     myUser.role === available_user_roles.TEACHER
   ) {
-    throw new ApiError(403, "Students and teachers cannot update accounts.");
+    throw new ApiError(
+      403,
+      "Students and teachers are not authorized to access this resource.",
+    );
   }
 
   const { user_id } = req.params;
 
   if (!user_id) {
-    throw new ApiError(400, "User Id is required.");
+    throw new ApiError(400, "User ID is required.");
   }
 
   const user = await User.findById(user_id).select("-password -refreshToken");
 
   if (!user) {
-    throw new ApiError(404, "User not found");
+    throw new ApiError(404, "User not found.");
   }
 
   const response_data = { ...user.toObject() };
@@ -298,7 +300,7 @@ export const getUserById = asyncHandler(async (req, res) => {
 export const getUserByUserName = asyncHandler(async (req, res) => {
   const myUser = req.user;
   if (!myUser) {
-    throw new ApiError(401, "Not logged in.");
+    throw new ApiError(401, "Authentication required.");
   }
 
   // const userId = req.user?._id;
@@ -310,13 +312,16 @@ export const getUserByUserName = asyncHandler(async (req, res) => {
   // }
 
   if (myUser.role === available_user_roles.STUDENT) {
-    throw new ApiError(403, "Students cannot update accounts.");
+    throw new ApiError(
+      403,
+      "Students are not authorized to access this resource.",
+    );
   }
 
   const { user_name } = req.body;
 
   if (!user_name) {
-    throw new ApiError(400, "User name is required.");
+    throw new ApiError(400, "Username is required.");
   }
 
   const user = await User.findOne({
@@ -324,7 +329,7 @@ export const getUserByUserName = asyncHandler(async (req, res) => {
   }).select("-password -refreshToken");
 
   if (!user) {
-    throw new ApiError(404, "User not found");
+    throw new ApiError(404, "User not found.");
   }
 
   return res.status(200).json(new ApiResponse(200, user, "User found."));

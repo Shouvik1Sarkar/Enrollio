@@ -9,7 +9,7 @@ export const createCourse = asyncHandler(async (req, res) => {
   const myUser = req.user;
 
   if (!myUser) {
-    throw new ApiError(400, "User not logged in.");
+    throw new ApiError(401, "User not logged in.");
   }
 
   if (myUser.role !== available_user_roles.SUPER_ADMIN) {
@@ -24,7 +24,10 @@ export const createCourse = asyncHandler(async (req, res) => {
   // }
 
   if (courseType === "professional" && !name) {
-    throw new ApiError(400, "Name is required for professional courses");
+    throw new ApiError(
+      400,
+      "Subject, standard and board are required for school courses",
+    );
   }
 
   if (courseType === "school" && (!subject || !standard || !board)) {
@@ -34,7 +37,7 @@ export const createCourse = asyncHandler(async (req, res) => {
     );
   }
 
-  if (!boards_enum.includes(board.toUpperCase())) {
+  if (board && !boards_enum.includes(board.toUpperCase())) {
     throw new ApiError(400, "BOARD DOES NOT EXIST");
   }
 
@@ -73,7 +76,7 @@ export const deleteCourse = asyncHandler(async (req, res) => {
   const myUser = req.user;
 
   if (!myUser) {
-    throw new ApiError(400, "User not logged in.");
+    throw new ApiError(401, "User not logged in.");
   }
 
   if (myUser.role !== available_user_roles.SUPER_ADMIN) {
@@ -99,11 +102,11 @@ export const getAllCourses = asyncHandler(async (req, res) => {
   const myUser = req.user;
 
   if (!myUser) {
-    throw new ApiError(400, "User not logged in.");
+    throw new ApiError(401, "User not logged in.");
   }
 
   if (myUser.role !== available_user_roles.SUPER_ADMIN) {
-    throw new ApiError(403, "Only admin can see all the courses");
+    throw new ApiError(403, "Only Super Admin can view all courses.");
   }
 
   const allCourses = await Course.find();
@@ -115,7 +118,7 @@ export const getCourseById = asyncHandler(async (req, res) => {
   const myUser = req.user;
 
   if (!myUser) {
-    throw new ApiError(400, "User not logged in.");
+    throw new ApiError(401, "User not logged in.");
   }
 
   const { course_id } = req.params;
@@ -133,7 +136,7 @@ export const updateCourse = asyncHandler(async (req, res) => {
   const myUser = req.user;
 
   if (!myUser) {
-    throw new ApiError(400, "User not logged in.");
+    throw new ApiError(401, "User not logged in.");
   }
 
   if (myUser.role !== available_user_roles.SUPER_ADMIN) {
@@ -180,7 +183,7 @@ export const updateCourse = asyncHandler(async (req, res) => {
   );
 
   if (!updateCourse) {
-    throw new ApiError(409, "Course update failed.");
+    throw new ApiError(500, "Course update failed.");
   }
 
   return res

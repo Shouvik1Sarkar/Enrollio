@@ -8,7 +8,7 @@ export const createExam = asyncHandler(async (req, res) => {
   const user = req.user;
 
   if (!user) {
-    throw new ApiError(404, "User not logged In");
+    throw new ApiError(401, "User not logged in");
   }
 
   const { batch, title, date, totalMarks, passingMarks } = req.body;
@@ -43,7 +43,7 @@ export const createExam = asyncHandler(async (req, res) => {
   });
 
   if (!exam) {
-    throw new ApiError(403, "Exam not created.");
+    throw new ApiError(500, "Exam not created.");
   }
 
   return res.status(201).json(new ApiResponse(201, exam, "Exam created."));
@@ -53,7 +53,7 @@ export const getExamById = asyncHandler(async (req, res) => {
   const user = req.user;
 
   if (!user) {
-    throw new ApiError(404, "User not logged In");
+    throw new ApiError(401, "User not logged in");
   }
 
   const { exam_id } = req.params;
@@ -63,7 +63,7 @@ export const getExamById = asyncHandler(async (req, res) => {
     .populate("createdBy", "name userName email");
 
   if (!exam) {
-    throw new ApiError(400, "Exam not found.");
+    throw new ApiError(404, "Exam not found.");
   }
 
   return res.status(200).json(new ApiResponse(200, exam, "Exam details."));
@@ -73,13 +73,13 @@ export const updateExam = asyncHandler(async (req, res) => {
   const user = req.user;
 
   if (!user) {
-    throw new ApiError(404, "User not logged In");
+    throw new ApiError(401, "User not logged in");
   }
 
   const { exam_id } = req.params;
   const exam = await Exam.findById(exam_id);
   if (!exam) {
-    throw new ApiError(400, "Exam not found.");
+    throw new ApiError(404, "Exam not found.");
   }
   const { title, date, totalMarks, passingMarks } = req.body;
 
@@ -88,7 +88,7 @@ export const updateExam = asyncHandler(async (req, res) => {
     title,
   });
   if (existed_exam_title) {
-    throw new ApiError(400, "Exam title already exists");
+    throw new ApiError(409, "Exam title already exists");
   }
 
   const updateData = {};
@@ -116,7 +116,7 @@ export const deleteExam = asyncHandler(async (req, res) => {
   const user = req.user;
 
   if (!user) {
-    throw new ApiError(404, "User not logged In");
+    throw new ApiError(401, "User not logged in");
   }
 
   const { exam_id } = req.params;
@@ -124,7 +124,7 @@ export const deleteExam = asyncHandler(async (req, res) => {
   const exam = await Exam.findById(exam_id);
 
   if (!exam) {
-    throw new ApiError(400, "Exam not found.");
+    throw new ApiError(404, "Exam not found.");
   }
 
   await exam.deleteOne();
@@ -136,7 +136,7 @@ export const getExamsByBatch = asyncHandler(async (req, res) => {
   const user = req.user;
 
   if (!user) {
-    throw new ApiError(404, "User not logged In");
+    throw new ApiError(401, "User not logged in");
   }
 
   const { batch_id } = req.params;
@@ -144,7 +144,7 @@ export const getExamsByBatch = asyncHandler(async (req, res) => {
   const batch = await Batch.findById(batch_id);
 
   if (!batch) {
-    throw new ApiError(400, "Exam not found.");
+    throw new ApiError(404, "Batch not found.");
   }
 
   const allExams = await Exam.find({

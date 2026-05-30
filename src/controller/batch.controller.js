@@ -17,11 +17,11 @@ export const createBatch = asyncHandler(async (req, res) => {
   const myUser = await User.findById(user._id);
 
   if (!myUser) {
-    throw new ApiError(400, "User not logged in.");
+    throw new ApiError(401, "Authentication required.");
   }
 
   if (myUser.role === available_user_roles.STUDENT) {
-    throw new ApiError(400, "Student can not create.");
+    throw new ApiError(403, "Students cannot create batches.");
   }
 
   const {
@@ -42,6 +42,10 @@ export const createBatch = asyncHandler(async (req, res) => {
     name: courseName,
   });
 
+  if (!course) {
+    throw new ApiError(404, "Course not found.");
+  }
+
   logger.info({ course }, "COURSE->");
 
   if (!learning_modes_enum.includes(learningMode.toUpperCase())) {
@@ -54,7 +58,7 @@ export const createBatch = asyncHandler(async (req, res) => {
   });
 
   if (existedBatch) {
-    throw new ApiError(400, "Batch already exists.");
+    throw new ApiError(409, "Batch already exists.");
   }
 
   const batchName = `${courseName} Batch-${serial}`;
@@ -70,7 +74,7 @@ export const createBatch = asyncHandler(async (req, res) => {
   });
 
   if (!batch) {
-    throw new ApiError(400, "BATCH NOT CREATED.");
+    throw new ApiError(500, "Failed to create batch.");
   }
 
   return res.status(201).json(new ApiResponse(201, batch, "COURSE CREATED."));
@@ -80,12 +84,12 @@ export const getAllBatches = asyncHandler(async (req, res) => {
   const myUser = req.user;
 
   if (!myUser) {
-    throw new ApiError(401, "User not logged in.");
+    throw new ApiError(401, "Authentication required.");
   }
   if (myUser.role !== available_user_roles.SUPER_ADMIN) {
     // console.log("MY USER->", myUser);
 
-    throw new ApiError(403, "Only Super Amin can see all batches.");
+    throw new ApiError(403, "Insufficient permissions.");
   }
 
   const allBatches = await Batch.find().populate({
@@ -107,7 +111,7 @@ export const getBatchById = asyncHandler(async (req, res) => {
   const myUser = await User.findById(user._id);
 
   if (!myUser) {
-    throw new ApiError(400, "User not logged in.");
+    throw new ApiError(401, "User not logged in.");
   }
 
   const { batch_id } = req.params;
@@ -135,7 +139,7 @@ export const getBatchById = asyncHandler(async (req, res) => {
     .populate("createdBy", "name userName role");
 
   if (!batch) {
-    throw new ApiError(400, "Batch not found");
+    throw new ApiError(404, "Batch not found.");
   }
 
   return res.status(200).json(new ApiResponse(200, batch, "Batch found."));
@@ -147,7 +151,7 @@ export const updateBatch = asyncHandler(async (req, res) => {
   const myUser = await User.findById(user._id);
 
   if (!myUser) {
-    throw new ApiError(400, "User not logged in.");
+    throw new ApiError(401, "User not logged in.");
   }
 
   if (myUser.role !== available_user_roles.SUPER_ADMIN) {
@@ -211,17 +215,17 @@ export const deleteBatch = asyncHandler(async (req, res) => {
   // console.log("MY USER->", myUser);
 
   if (!myUser) {
-    throw new ApiError(400, "User not logged In.");
+    throw new ApiError(401, "User not logged in.");
   }
 
   if (myUser.role !== available_user_roles.SUPER_ADMIN) {
-    throw new ApiError(403, "Only Super Amin can delete batches.");
+    throw new ApiError(403, "Only Super Admin can delete batches.");
   }
   const { batch_id } = req.params;
   const batch = await Batch.findById(batch_id);
 
   if (!batch) {
-    throw new ApiError(400, "BATCH  not found");
+    throw new ApiError(404, "Batch not found");
   }
 
   await batch.deleteOne();
@@ -235,7 +239,7 @@ export const removeStudent = asyncHandler(async (req, res) => {
   // const myUser = await User.findById(user._id);
 
   if (!myUser) {
-    throw new ApiError(400, "User not logged in.");
+    throw new ApiError(401, "User not logged in.");
   }
 
   if (myUser.role === available_user_roles.STUDENT) {
@@ -290,11 +294,14 @@ export const allStudentsOfBatch = asyncHandler(async (req, res) => {
   // const myUser = await User.findById(user._id);
 
   if (!myUser) {
-    throw new ApiError(400, "User not logged in.");
+    throw new ApiError(401, "User not logged in.");
   }
 
   if (myUser.role === available_user_roles.STUDENT) {
-    throw new ApiError(403, "Students cannot remove student.");
+    throw new ApiError(
+      403,
+      "Students are not allowed to view all students of a batch.",
+    );
   }
 
   const { batch_id } = req.params;
