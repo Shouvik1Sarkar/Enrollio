@@ -300,7 +300,7 @@ export const getStudentBalance = asyncHandler(async (req, res) => {
         overdue, // the actual overdue records
       },
 
-      "fees not found.",
+      "Balance fetched.",
     ),
   );
 });
