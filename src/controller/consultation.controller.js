@@ -14,6 +14,8 @@ export const bookConsultation = asyncHandler(async (req, res) => {
     throw new ApiError(400, "All the fields are required.");
   }
 
+  if (!name || !phone) throw new ApiError(400, "Name and phone are required.");
+
   const existing = await Consultation.findOne({
     phone,
   });

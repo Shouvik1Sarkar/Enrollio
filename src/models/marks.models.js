@@ -45,7 +45,7 @@ const marksSchema = new mongoose.Schema(
 
     maxMarks: {
       type: Number,
-      required: true, // 45/50 vs 45/100 means very different things
+      // required: true, // 45/50 vs 45/100 means very different things
     },
 
     // month: {
@@ -55,6 +55,12 @@ const marksSchema = new mongoose.Schema(
 
     remarks: {
       type: String, // optional short note from teacher on this test
+      default: null,
+      trim: true,
+    },
+
+    passing_status: {
+      type: String,
       default: null,
       trim: true,
     },

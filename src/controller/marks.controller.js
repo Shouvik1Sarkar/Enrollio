@@ -32,8 +32,11 @@ export const createMarks = asyncHandler(async (req, res) => {
     throw new ApiError(404, "Batch not found.");
   }
 
-  const { user_name, testName, testType, marksObtained, maxMarks, remarks } =
-    req.body;
+  const { user_name, testName, testType, marksObtained, remarks } = req.body;
+
+  if (marksObtained > exam.totalMarks) {
+    throw new ApiError(400, "Marks obtained must be less than full marks.");
+  }
 
   const find_user = await User.findOne({
     userName: user_name,
@@ -55,6 +58,14 @@ export const createMarks = asyncHandler(async (req, res) => {
   //     title: testName,
   //   });
 
+  let passing_status;
+
+  if (marksObtained > exam.passingMarks) {
+    passing_status = "passed";
+  } else {
+    passing_status = "failed";
+  }
+
   const month = new Date();
 
   const marks = await Marks.create({
@@ -64,10 +75,12 @@ export const createMarks = asyncHandler(async (req, res) => {
     exam: exam_id,
     testName,
     marksObtained,
-    maxMarks,
+    // maxMarks,
     remarks,
     month,
-    teacher: user._id, // for now later from the batch
+    // teacher: user._id, // for now later from the batch
+    teacher: exam.teacher,
+    passing_status,
   });
 
   if (!marks) {

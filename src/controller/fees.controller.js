@@ -1,4 +1,5 @@
 import Batch from "../models/batch.models.js";
+import Exam from "../models/exam.models.js";
 import Student from "../models/student.models.js";
 import ApiError from "../utils/ApiError.utils.js";
 import ApiResponse from "../utils/ApiResponse.utils.js";
@@ -26,16 +27,17 @@ export const addFeeRecord = asyncHandler(async (req, res) => {
   if (student.enrolledBatches.length == 0) {
     throw new ApiError(400, "Student not enrolled to any batches.");
   }
+
   for (const batch of student.enrolledBatches) {
-    // skip if this batch already has a record for this month
     const alreadyExists = student.feeHistory.some(
       (f) => f.month === month && f.batch.toString() === batch._id.toString(),
     );
-    if (alreadyExists) continue; // skip, don't throw — other batches still need records
+
+    if (alreadyExists) continue;
 
     student.feeHistory.push({
-      batch: batch._id, // ← which batch
-      amount: batch.monthlyFees, // ← that batch's fee
+      batch: batch._id,
+      amount: batch.monthlyFees,
       month,
       dueDate,
       status: "pending",
@@ -43,7 +45,7 @@ export const addFeeRecord = asyncHandler(async (req, res) => {
     });
   }
 
-  student.save({ validateBeforeSave: false });
+  await student.save({ validateBeforeSave: false });
 
   const student1 = await Student.findById(student_id).populate(
     "feeHistory.batch",
@@ -209,7 +211,7 @@ export const markEachFeePaid = asyncHandler(async (req, res) => {
     throw new ApiError(404, "Student not found");
   }
 
-  const fees = await student.feeHistory.id(fee_id);
+  const fees = student.feeHistory.id(fee_id);
   if (!fees) {
     throw new ApiError(404, "Fee record not found.");
   }
@@ -276,6 +278,7 @@ export const getStudentBalance = asyncHandler(async (req, res) => {
       totalPaid += record.amount;
     } else {
       if (record.dueDate < now) {
+        totalOverdue += record.amount;
         overdue.push(record);
       } else {
         totalPending += record.amount;
@@ -293,6 +296,7 @@ export const getStudentBalance = asyncHandler(async (req, res) => {
         totalPending, // sum of all pending records
         // balance: totalPending, // what's still owed
         overdueCount: overdue.length, // how many are overdue
+        balance: totalPending + totalOverdue,
         overdue, // the actual overdue records
       },
 
