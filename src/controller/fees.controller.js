@@ -24,7 +24,7 @@ export const addFeeRecord = asyncHandler(async (req, res) => {
     throw new ApiError(404, "Student not found.");
   }
 
-  if (student.enrolledBatches.length == 0) {
+  if (student.enrolledBatches.length === 0) {
     throw new ApiError(400, "Student not enrolled to any batches.");
   }
 
@@ -80,7 +80,7 @@ export const addSingleFeeRecord = asyncHandler(async (req, res) => {
     throw new ApiError(404, "Student not found.");
   }
 
-  if (student.enrolledBatches.length == 0) {
+  if (student.enrolledBatches.length === 0) {
     throw new ApiError(400, "Student not enrolled to any batches.");
   }
 
