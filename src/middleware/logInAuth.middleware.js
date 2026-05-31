@@ -13,7 +13,11 @@ export async function logInAuth(req, res, next) {
     // return next();
   }
 
-  const decodedData = await jwt.verify(accessId, JWT_SECRET);
+  try {
+    const decodedData = await jwt.verify(accessId, JWT_SECRET);
+  } catch (err) {
+    throw new ApiError(401, "Invalid or expired token.");
+  }
 
   const user = await User.findById(decodedData._id);
 
