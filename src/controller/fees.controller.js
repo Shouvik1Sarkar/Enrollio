@@ -226,7 +226,8 @@ export const markEachFeePaid = asyncHandler(async (req, res) => {
   fees.note = note ?? "";
   await student.save({ validateBeforeSave: false });
 
-  return res.status(200).json(new ApiResponse(200, student, "fees paid."));
+  // return res.status(200).json(new ApiResponse(200, student, "fees paid."));
+  return res.status(200).json(new ApiResponse(200, fees, "fees paid."));
 });
 
 export const getStudentFeeHistory = asyncHandler(async (req, res) => {

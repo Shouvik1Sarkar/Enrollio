@@ -31,6 +31,7 @@ export const set_salary = asyncHandler(async (req, res) => {
       userId: get_user._id,
     });
     // console.log("SALARY: ", teacher);
+    logger.debug({ teacher }, "Salary");
     if (!teacher) {
       throw new ApiError(404, "Teacher not found.");
     }
