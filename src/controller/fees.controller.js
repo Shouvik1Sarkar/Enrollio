@@ -206,7 +206,9 @@ export const markEachFeePaid = asyncHandler(async (req, res) => {
   const { student_id, fee_id } = req.params;
   const { note } = req.body;
 
-  const student = await Student.findById(student_id);
+  const student =
+    await Student.findById(student_id).populate("enrolledBatches");
+
   if (!student) {
     throw new ApiError(404, "Student not found");
   }
