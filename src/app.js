@@ -13,6 +13,7 @@ import examRouter from "./routes/exam.routes.js";
 import marksRouter from "./routes/marks.routes.js";
 import guestRouter from "./routes/guest.routes.js";
 import helmet from "helmet";
+import arcjetMiddleware from "./middleware/arcjet.middleware.js";
 // import attendanceRouter from "./routes/attendance.routes.js";
 
 const app = express();
@@ -39,6 +40,10 @@ app.use(
 
 app.use(helmet());
 app.use(cookieParser());
+
+if (process.env.NODE_ENV !== "test") {
+  app.use(arcjetMiddleware);
+}
 
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/user", userRouter);
