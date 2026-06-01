@@ -19,7 +19,8 @@ export const addFeeRecord = asyncHandler(async (req, res) => {
   const month = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
   const dueDate = new Date(now.getFullYear(), now.getMonth(), 10);
 
-  const student = await Student.findById(student_id);
+  const student =
+    await Student.findById(student_id).populate("enrolledBatches");
   if (!student) {
     throw new ApiError(404, "Student not found.");
   }
@@ -225,7 +226,7 @@ export const markEachFeePaid = asyncHandler(async (req, res) => {
   fees.status = "paid";
   fees.paidAt = new Date();
   fees.collectedBy = user._id;
-  fees.note = note ?? "";
+  fees.note = note ?? null;
   await student.save({ validateBeforeSave: false });
 
   // return res.status(200).json(new ApiResponse(200, student, "fees paid."));
@@ -273,6 +274,7 @@ export const getStudentBalance = asyncHandler(async (req, res) => {
   let totalPending = 0;
   let overdue = [];
 
+  let totalOverdue = 0;
   const now = new Date();
 
   student.feeHistory.forEach((record) => {
@@ -298,6 +300,7 @@ export const getStudentBalance = asyncHandler(async (req, res) => {
         totalPaid, // sum of all paid records
         totalPending, // sum of all pending records
         // balance: totalPending, // what's still owed
+        totalOverdue,
         overdueCount: overdue.length, // how many are overdue
         balance: totalPending + totalOverdue,
         overdue, // the actual overdue records
