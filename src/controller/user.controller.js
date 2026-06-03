@@ -190,13 +190,21 @@ export const allUsers = asyncHandler(async (req, res) => {
     throw new ApiError(401, "Authentication required.");
   }
 
-  // const userId = req.user?._id;
+  const userId = req.user._id;
+  const cachedKey = `All:${userId}`;
+  let cachedMe;
 
-  // const myUser = await User.findById(userId).select("-password -refreshToken");
+  try {
+    cachedMe = await redisClient.get(cachedKey);
+  } catch (err) {
+    console.log("Redis error, fallback to DB");
+  }
 
-  // if (myUser.role !== available_user_roles.SUPER_ADMIN) {
-  //   throw new ApiError(401, null, "Only super admin can delete an account");
-  // }
+  if (cachedMe) {
+    return res
+      .status(200)
+      .json(new ApiResponse(200, JSON.parse(cachedMe), "*All Users Found.*"));
+  }
 
   const allUsers = await User.find();
 
@@ -215,6 +223,12 @@ export const allUsers = asyncHandler(async (req, res) => {
   //     return data;
   //   }),
   // );
+
+  try {
+    await redisClient.setEx(cachedKey, 60 * 20, JSON.stringify(allUsers));
+  } catch (err) {
+    console.log("Redis set failed");
+  }
 
   return res.status(200).json(new ApiResponse(200, allUsers, "All Users."));
 });
@@ -256,6 +270,15 @@ export const updateUserRole = asyncHandler(async (req, res) => {
   if (!change_user) {
     throw new ApiError(404, "User not found.");
   }
+
+  // if (user_id == myUser._id) {
+  try {
+    await redisClient.del(`Me:${user_id}`);
+  } catch (error) {
+    console.error("Redis del failed:", error);
+  }
+  // }
+
   return res
     .status(200)
     .json(new ApiResponse(200, change_user, "ROLE updated."));
