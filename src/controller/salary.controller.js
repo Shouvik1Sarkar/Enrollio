@@ -1,5 +1,6 @@
 // ***Teacher Salary***
 
+import redisClient from "../../config/redis.config.js";
 import Admin from "../models/admin.models.js";
 import Salary from "../models/salary.models.js";
 import Teacher from "../models/teacher.models.js";
@@ -7,6 +8,7 @@ import User from "../models/user.models.js";
 import ApiError from "../utils/ApiError.utils.js";
 import ApiResponse from "../utils/ApiResponse.utils.js";
 import asyncHandler from "../utils/asyncHandler.utils.js";
+import logger from "../utils/logger.utils.js";
 
 export const set_salary = asyncHandler(async (req, res) => {
   const user = req.user;
@@ -62,6 +64,14 @@ export const set_salary = asyncHandler(async (req, res) => {
     status: "pending",
     // note: note || undefined,
   });
+
+  if (get_user.role == "teacher") {
+    teacher.salaryRecord.push(salary);
+    await teacher.save();
+  } else {
+    admin.salaryRecord.push(salary);
+    await admin.save();
+  }
 
   if (!salary) {
     throw new ApiError(500, "Salary not created.");
@@ -262,3 +272,69 @@ export const deleteSalaryRecord = asyncHandler(async (req, res) => {
 //     .status(200)
 //     .json(new ApiResponse(200, null, "Salary record deleted."));
 // });
+
+export const my_salary = asyncHandler(async (req, res) => {
+  const user = req.user;
+
+  if (!user) {
+    throw new ApiError(401, "User not logged in.");
+  }
+
+  const userId = user._id;
+
+  const getUser = await User.findById(userId);
+  if (!getUser) {
+    throw new ApiError(403, "User not found.");
+  }
+
+  // const userId = req.user._id;
+  const cachedKey = `Salary:${userId}`;
+  let cachedMe;
+
+  try {
+    cachedMe = await redisClient.get(cachedKey);
+  } catch (err) {
+    console.log("Redis error, fallback to DB");
+  }
+
+  if (cachedMe) {
+    return res
+      .status(200)
+      .json(new ApiResponse(200, JSON.parse(cachedMe), "*My Salary.*"));
+  }
+
+  let salary = [];
+  if (getUser.role == "teacher") {
+    const teacher = await Teacher.findOne({ userId: getUser._id }).populate(
+      "salaryRecord",
+      "user amount month dueDate status paidAt paidBy",
+    );
+    if (!teacher) {
+      throw new ApiError(404, "Teacher not found.");
+    }
+    // salary.push()
+
+    console.log("salary", teacher);
+
+    console.log("TEACHER SALARY -> ", teacher.salaryRecord);
+    teacher.salaryRecord.map((f) => {
+      salary.push(f);
+    });
+  } else if (getUser.role == "admin") {
+    const admin = await Admin.findOne({ userId: getUser._id });
+    if (!admin) {
+      throw new ApiError(404, "Teacher not found.");
+    }
+    admin.salaryRecord.map((f) => {
+      salary.push(f);
+    });
+  }
+
+  try {
+    await redisClient.setEx(cachedKey, 60 * 20, JSON.stringify(salary));
+  } catch (err) {
+    console.log("Redis set failed");
+  }
+
+  return res.status(200).json(new ApiResponse(200, salary, "My salary"));
+});

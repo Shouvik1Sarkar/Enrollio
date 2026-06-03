@@ -190,12 +190,13 @@ export const getTeacherById = asyncHandler(async (req, res) => {
     throw new ApiError(404, "Teacher not found.");
   }
 
-  const salary = await Salary.findOne({
+  let salary = await Salary.findOne({
     user: teacher.userId,
   });
 
   if (!salary) {
-    throw new ApiError(404, "Salary not found.");
+    // throw new ApiError(404, "Salary not found.");
+    salary = undefined;
   }
 
   return res

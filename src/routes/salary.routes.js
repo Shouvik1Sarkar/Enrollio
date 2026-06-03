@@ -7,6 +7,7 @@ import authorizeRoles from "../middleware/authorizeRoles.middleware.js";
 import {
   deleteSalaryRecord,
   getAllSalaries,
+  my_salary,
   // getSalariesByMonth,
   paid_salary,
   salary_history,
@@ -46,6 +47,7 @@ salaryRouter.get(
   authorizeRoles(admin, super_admin),
   getAllSalaries,
 );
+salaryRouter.get("/my-salary", logInAuth, my_salary);
 
 // get salary by specific month
 // salaryRouter.get(
