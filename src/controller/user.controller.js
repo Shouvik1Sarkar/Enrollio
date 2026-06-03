@@ -1,4 +1,5 @@
 import redisClient from "../../config/redis.config.js";
+import Admin from "../models/admin.models.js";
 import Student from "../models/student.models.js";
 import Teacher from "../models/teacher.models.js";
 import User from "../models/user.models.js";
@@ -42,11 +43,26 @@ export const getUser = asyncHandler(async (req, res) => {
   if (myUser.role === available_user_roles.STUDENT) {
     const student = await Student.findOne({
       userId: myUser._id,
-    })
-      .select("-createdBy -__v")
-      .populate("enrolledBatches", "name course");
+    }).select("-createdBy -__v");
+    // .populate("userId", "name course");
 
     response_data.student_data = student;
+  } else if (myUser.role === available_user_roles.TEACHER) {
+    const teacher = await Teacher.findOne({
+      userId: myUser._id,
+    });
+    // .select("-createdBy -__v");
+    // .populate("userId", "userName email role");
+
+    response_data.teacher_data = teacher;
+  } else if (myUser.role === available_user_roles.ADMIN) {
+    const admin = await Admin.findOne({
+      userId: myUser._id,
+    });
+    // .select("-createdBy -__v");
+    // .populate("userId", "userName email role");
+
+    response_data.admin_data = admin;
   }
 
   try {
