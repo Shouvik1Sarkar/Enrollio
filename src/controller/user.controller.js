@@ -9,6 +9,7 @@ import {
   available_user_roles,
   user_roles_enum,
 } from "../utils/constants.utils.js";
+import logger from "../utils/logger.utils.js";
 
 export const getUser = asyncHandler(async (req, res) => {
   // console.log("MY USER.");
@@ -94,6 +95,7 @@ export const updateUser = asyncHandler(async (req, res) => {
 
   try {
     await redisClient.del(`Me:${userId}`);
+    await redisClient.del(`users:all`);
   } catch (error) {
     console.error("Redis del failed:", error);
   }
@@ -179,6 +181,13 @@ export const deleteUser = asyncHandler(async (req, res) => {
 
   await user.deleteOne();
 
+  try {
+    await redisClient.del(`users:all`);
+    await redisClient.del(`Me:${user_id}`);
+  } catch (error) {
+    logger.error("Error redis");
+  }
+
   return res
     .status(200)
     .json(new ApiResponse(200, null, "User deleted successfully"));
@@ -190,8 +199,8 @@ export const allUsers = asyncHandler(async (req, res) => {
     throw new ApiError(401, "Authentication required.");
   }
 
-  const userId = req.user._id;
-  const cachedKey = `All:${userId}`;
+  // const userId = req.user._id;
+  const cachedKey = `users:all`;
   let cachedMe;
 
   try {
@@ -225,7 +234,7 @@ export const allUsers = asyncHandler(async (req, res) => {
   // );
 
   try {
-    await redisClient.setEx(cachedKey, 60 * 20, JSON.stringify(allUsers));
+    await redisClient.setEx(cachedKey, 60 * 5, JSON.stringify(allUsers));
   } catch (err) {
     console.log("Redis set failed");
   }
@@ -274,6 +283,7 @@ export const updateUserRole = asyncHandler(async (req, res) => {
   // if (user_id == myUser._id) {
   try {
     await redisClient.del(`Me:${user_id}`);
+    await redisClient.del(`users:all`);
   } catch (error) {
     console.error("Redis del failed:", error);
   }
