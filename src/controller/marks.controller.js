@@ -1,3 +1,4 @@
+import redisClient from "../../config/redis.config.js";
 import Batch from "../models/batch.models.js";
 import Exam from "../models/exam.models.js";
 import Marks from "../models/marks.models.js";
@@ -128,6 +129,8 @@ export const updateMarks = asyncHandler(async (req, res) => {
   if (remarks) marks.remarks = remarks;
   if (month) marks.month = month;
 
+  await redisClient.del(`Marks:me:${userId}`);
+
   await marks.save();
   return res.status(200).json(new ApiResponse(200, marks, "Marks Updated."));
 });
@@ -223,6 +226,23 @@ export const getMyMarks = asyncHandler(async (req, res) => {
   if (user.role !== "student") {
     throw new ApiError(403, "Only students can access their marks.");
   }
+
+  const userId = req.user._id;
+  const cachedKey = `Marks:me:${userId}`;
+  let cachedMe;
+
+  try {
+    cachedMe = await redisClient.get(cachedKey);
+  } catch (err) {
+    console.log("Redis error, fallback to DB");
+  }
+
+  if (cachedMe) {
+    return res
+      .status(200)
+      .json(new ApiResponse(200, JSON.parse(cachedMe), "*User Found.*"));
+  }
+
   const marks = await Marks.find({
     student: user._id,
   });
@@ -230,6 +250,12 @@ export const getMyMarks = asyncHandler(async (req, res) => {
   // if (!marks) {
   //   throw new ApiError(400, "Marks not found.");
   // }
+
+  try {
+    await redisClient.setEx(cachedKey, 60 * 5, JSON.stringify(marks));
+  } catch (err) {
+    console.log("Redis set failed");
+  }
 
   return res.status(200).json(new ApiResponse(200, marks, "My Marks."));
 });
