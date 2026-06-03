@@ -65,6 +65,8 @@ export const updateUser = asyncHandler(async (req, res) => {
     throw new ApiError(401, "Authentication required.");
   }
 
+  const userId = req.user._id;
+
   if (myUser.role === available_user_roles.STUDENT) {
     throw new ApiError(403, "Students cannot update accounts.");
   }
@@ -90,6 +92,11 @@ export const updateUser = asyncHandler(async (req, res) => {
     throw new ApiError(404, "User not found.");
   }
 
+  try {
+    await redisClient.del(`Me:${userId}`);
+  } catch (error) {
+    console.error("Redis del failed:", error);
+  }
   return res
     .status(200)
     .json(new ApiResponse(200, updatedUser, "User updated successfully."));
