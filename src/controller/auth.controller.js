@@ -13,6 +13,7 @@ import jwt from "jsonwebtoken";
 
 import logger from "../utils/logger.utils.js";
 import { REFRESH_TOKEN_SECRET } from "../../config/env.config.js";
+import redisClient from "../../config/redis.config.js";
 
 export const createFirstUser = asyncHandler(async (req, res) => {
   const { name, userName, email, password } = req.body;

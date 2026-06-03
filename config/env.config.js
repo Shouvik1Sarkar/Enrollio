@@ -24,4 +24,7 @@ export const {
 
   // ARCJET
   ARCJET_KEY,
+
+  // REDIS
+  REDIS_URL,
 } = process.env;

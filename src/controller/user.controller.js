@@ -1,3 +1,4 @@
+import redisClient from "../../config/redis.config.js";
 import Student from "../models/student.models.js";
 import Teacher from "../models/teacher.models.js";
 import User from "../models/user.models.js";
@@ -10,19 +11,28 @@ import {
 } from "../utils/constants.utils.js";
 
 export const getUser = asyncHandler(async (req, res) => {
+  // console.log("MY USER.");
   const myUser = req.user;
 
   if (!myUser) {
     throw new ApiError(401, "Authentication required.");
   }
 
-  // const userId = req.user._id;
+  const userId = req.user._id;
+  const cachedKey = `Me:${userId}`;
+  let cachedMe;
 
-  // const myUser = await User.findById(userId).select("-password -refreshToken");
+  try {
+    cachedMe = await redisClient.get(cachedKey);
+  } catch (err) {
+    console.log("Redis error, fallback to DB");
+  }
 
-  // if (!myUser) {
-  //   throw new ApiError(401, "User not found");
-  // }
+  if (cachedMe) {
+    return res
+      .status(200)
+      .json(new ApiResponse(200, JSON.parse(cachedMe), "*User Found.*"));
+  }
 
   const response_data = { ...myUser.toObject() };
 
@@ -36,6 +46,12 @@ export const getUser = asyncHandler(async (req, res) => {
       .populate("enrolledBatches", "name course");
 
     response_data.student_data = student;
+  }
+
+  try {
+    await redisClient.setEx(cachedKey, 60 * 20, JSON.stringify(response_data));
+  } catch (err) {
+    console.log("Redis set failed");
   }
 
   return res
