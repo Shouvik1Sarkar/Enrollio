@@ -21,18 +21,23 @@ const super_admin = available_user_roles.SUPER_ADMIN;
 const teacher = available_user_roles.TEACHER;
 const student = available_user_roles.STUDENT;
 
+// *** SET SALARY *** \\
 salaryRouter.post(
   "/create-salary/:user_id",
   logInAuth,
   authorizeRoles(admin, super_admin),
   set_salary,
 );
+
+// *** PAID SALARY *** \\
 salaryRouter.post(
   "/paid/:user_id",
   logInAuth,
   authorizeRoles(admin, super_admin),
   paid_salary,
 );
+
+// *** SALARY HISTORY *** \\
 salaryRouter.get(
   "/paid/:user_id",
   logInAuth,
@@ -41,12 +46,16 @@ salaryRouter.get(
 );
 
 // get all pending/overdue salaries — admin dashboard view
+
+// *** GET ALL SALARIES *** \\
 salaryRouter.get(
   "/all",
   logInAuth,
   authorizeRoles(admin, super_admin),
   getAllSalaries,
 );
+
+// *** MY SALARY *** \\
 salaryRouter.get("/my-salary", logInAuth, my_salary);
 
 // get salary by specific month
@@ -67,6 +76,7 @@ salaryRouter.get("/my-salary", logInAuth, my_salary);
 
 // delete a wrong salary record
 
+//*** DELETE SALARY RECORD ***/
 salaryRouter.delete(
   "/:salary_id",
   logInAuth,

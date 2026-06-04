@@ -20,42 +20,55 @@ const super_admin = available_user_roles.SUPER_ADMIN;
 const teacher = available_user_roles.TEACHER;
 const student = available_user_roles.STUDENT;
 
+// *** GET USER *** \\
 userRouter.get(
   "/me",
   logInAuth,
   authorizeRoles(admin, super_admin, teacher),
   getUser,
 );
+
+// *** UPDATE USER *** \\
 userRouter.patch(
   "/update",
   logInAuth,
   authorizeRoles(admin, super_admin, teacher),
   updateUser,
 );
+
+// *** ALL USERS *** \\
 userRouter.get(
   "/all-users",
   logInAuth,
   authorizeRoles(admin, super_admin, teacher),
   allUsers,
 );
+
+// *** GET USER BY USER NAME*** \\
 userRouter.get(
   "/username",
   logInAuth,
   authorizeRoles(admin, super_admin, teacher),
   getUserByUserName,
 );
+
+// *** DELETE USER *** \\
 userRouter.delete(
   "/delete/:user_id",
   logInAuth,
   authorizeRoles(super_admin),
   deleteUser,
 );
+
+// *** UPDATE USER ROLE*** \\
 userRouter.patch(
   "/role/:user_id",
   logInAuth,
   authorizeRoles(admin, super_admin, teacher),
   updateUserRole,
 );
+
+// *** GET USER BY ID *** \\
 userRouter.get(
   "/:user_id",
   logInAuth,

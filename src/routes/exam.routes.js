@@ -25,6 +25,7 @@ const super_admin = available_user_roles.SUPER_ADMIN;
 const teacher = available_user_roles.TEACHER;
 const student = available_user_roles.STUDENT;
 
+//*** CREATE EXAM ***/
 examRouter.post(
   "/create",
   logInAuth,
@@ -32,6 +33,7 @@ examRouter.post(
   createExam,
 );
 
+//*** GET EXAM BY ID ***/
 examRouter.get(
   "/get/:exam_id",
   logInAuth,
@@ -39,6 +41,7 @@ examRouter.get(
   getExamById,
 );
 
+//*** UPDATE EXAM ***/
 examRouter.patch(
   "/update/:exam_id",
   logInAuth,
@@ -46,6 +49,7 @@ examRouter.patch(
   updateExam,
 );
 
+//*** DELETE EXAM ***/
 examRouter.delete(
   "/delete/:exam_id",
   logInAuth,
@@ -53,6 +57,7 @@ examRouter.delete(
   deleteExam,
 );
 
+//*** GET EXAMS BY ID ***/
 examRouter.get(
   "/batch/:batch_id",
   logInAuth,

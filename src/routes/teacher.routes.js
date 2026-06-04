@@ -20,20 +20,24 @@ const super_admin = available_user_roles.SUPER_ADMIN;
 const teacher = available_user_roles.TEACHER;
 const student = available_user_roles.STUDENT;
 
+// *** SETUP TEACHER PROFILE *** \\
 teacherRouter.post("/setup/:userId", logInAuth, setupTeacherProfile);
+
+// *** UPDATE TEACHER *** \\
 teacherRouter.post(
   "/update/:userId",
   logInAuth,
   authorizeRoles(admin, super_admin),
   updateTeacher,
 );
+// *** UPDATE SALARY *** \\
 teacherRouter.patch(
   "/update/salary/:teacher_id",
   logInAuth,
   authorizeRoles(admin, super_admin),
   updateSalary,
 );
-
+// *** DELETE TEACHER *** \\
 teacherRouter.delete(
   "/delete/:teacher_id",
   logInAuth,
@@ -45,6 +49,7 @@ teacherRouter.delete(
 
 // teacher's own routes
 
+// *** GET MY BATCHES *** \\
 teacherRouter.get(
   "/my-batches",
   logInAuth,
@@ -59,12 +64,16 @@ teacherRouter.get(
 // );
 
 // // admin-only teacher management
+
+// *** GET TEACHER BY ID *** \\
 teacherRouter.get(
   "/:teacher_id",
   logInAuth,
   // authorizeRoles(admin, super_admin),
   getTeacherById,
 );
+
+// *** ASSIGN TEACHER TO BATCH *** \\
 teacherRouter.patch(
   "/:teacher_id/assign-batch",
   logInAuth,

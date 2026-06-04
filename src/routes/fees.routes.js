@@ -22,12 +22,15 @@ const super_admin = available_user_roles.SUPER_ADMIN;
 const teacher = available_user_roles.TEACHER;
 const student = available_user_roles.STUDENT;
 
+// *** ADD FEE RECORD *** \\
 feesRouter.post(
   "/:student_id/fees/add",
   logInAuth,
   authorizeRoles(admin, super_admin),
   addFeeRecord, // admin adds a pending fee for a month
 );
+
+// *** ADD SINGLE FEE RECORD *** \\
 feesRouter.post(
   "/:student_id/fees/add/:batch_id",
   logInAuth,
@@ -35,6 +38,7 @@ feesRouter.post(
   addSingleFeeRecord, // admin adds a pending fee for a month
 );
 
+// *** FEED BY ID *** \\
 feesRouter.get(
   "/:student_id/fees/:fee_id",
   logInAuth,
@@ -42,6 +46,7 @@ feesRouter.get(
   feeById, // remove a wrong entry
 );
 
+// *** MARK FEE PAID *** \\
 feesRouter.patch(
   "/:student_id/pay",
   logInAuth,
@@ -49,6 +54,7 @@ feesRouter.patch(
   markFeePaid, // mark a specific fee record as paid
 );
 
+// *** MARK EACH FEE PAID *** \\
 feesRouter.patch(
   "/:student_id/fees/:fee_id/pay",
   logInAuth,
@@ -56,12 +62,14 @@ feesRouter.patch(
   markEachFeePaid, // mark a specific fee record as paid
 );
 
+// *** GET STUDENT FEE HISTORY *** \\
 feesRouter.get(
   "/:student_id/fees",
   logInAuth,
   authorizeRoles(admin, super_admin, teacher),
   getStudentFeeHistory, // full fee history of one student
 );
+// *** GET STUDENT BALANCE *** \\
 feesRouter.get(
   "/balance/:student_id",
   logInAuth,
@@ -69,6 +77,7 @@ feesRouter.get(
   getStudentBalance, // total due vs paid vs balance
 );
 
+// *** DELETE FEE RECORD *** \\
 feesRouter.delete(
   "/delete/:student_id/fees/:fee_id",
   logInAuth,

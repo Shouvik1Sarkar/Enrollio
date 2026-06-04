@@ -27,6 +27,7 @@ const super_admin = available_user_roles.SUPER_ADMIN;
 const teacher = available_user_roles.TEACHER;
 const student = available_user_roles.STUDENT;
 
+//*** CREATE MARKS *** \\
 marksRouter.post(
   "/create/:exam_id/:batch_id",
   logInAuth,
@@ -34,6 +35,7 @@ marksRouter.post(
   createMarks,
 );
 
+//*** UPDATE MARKS *** \\
 marksRouter.patch(
   "/update/:marks_id/:student_id",
   logInAuth,
@@ -41,6 +43,7 @@ marksRouter.patch(
   updateMarks,
 );
 
+//*** DELETE MARKS *** \\
 marksRouter.delete(
   "/delete/:marks_id",
   logInAuth,
@@ -49,6 +52,8 @@ marksRouter.delete(
 );
 
 // get all marks for one student — full history across all exams
+
+//*** GET MARKS BY STUDENT ***/
 marksRouter.get(
   "/student/:student_id",
   logInAuth,
@@ -57,9 +62,13 @@ marksRouter.get(
 );
 
 // student sees their own marks
+
+// *** GET MY MARKS *** \\
 marksRouter.get("/me", logInAuth, authorizeRoles(student), getMyMarks);
 
 // get one specific mark record
+
+// *** GET MARKS BY EXAM ID *** \\
 marksRouter.get(
   "/all/:exam_id",
   logInAuth,
@@ -68,6 +77,8 @@ marksRouter.get(
 );
 
 // get one specific mark record
+
+// *** GET MARKS BY ID *** \\
 marksRouter.get(
   "/:marks_id",
   logInAuth,

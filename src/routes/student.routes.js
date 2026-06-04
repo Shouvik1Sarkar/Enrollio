@@ -22,10 +22,16 @@ const super_admin = available_user_roles.SUPER_ADMIN;
 const teacher = available_user_roles.TEACHER;
 const student = available_user_roles.STUDENT;
 
+// *** GET ME *** \\
 studentRouter.get("/getme", logInAuth, authorizeRoles(student), getMe);
+
+// *** MY FEES *** \\
 studentRouter.get("/my-fees", logInAuth, authorizeRoles(student), my_fees);
+
+// *** MY MARKS *** \\
 studentRouter.get("/my-marks", logInAuth, authorizeRoles(student), my_marks);
-// PROFILE
+
+// *** SETUP STUDENT PROFILE *** \\
 studentRouter.post(
   "/setup/:userId",
   logInAuth,
@@ -34,6 +40,7 @@ studentRouter.post(
 );
 // creates the Student doc linked to an existing User
 
+// *** GET ALL STUDENTS *** \\
 studentRouter.get(
   "/all",
   logInAuth,
@@ -42,9 +49,11 @@ studentRouter.get(
 );
 // // admin sees all students, with filters
 
+// *** GET STUDENTS BY ID *** \\
 studentRouter.get("/:student_id", logInAuth, getStudentById);
 // // full profile + enrolled batches populated
 
+// *** UPDATE STUDENT PROFILE *** \\
 studentRouter.patch(
   "/:student_id",
   logInAuth,
@@ -58,6 +67,8 @@ studentRouter.patch(
 // // soft delete via user.isActive = false
 
 // // ENROLLMENT
+
+// *** ENROLL STUDENT IN BATCH *** \\
 studentRouter.post(
   "/:student_id/enroll",
   logInAuth,
@@ -65,6 +76,7 @@ studentRouter.post(
   enrollStudentInBatch,
 );
 
+// *** REMOVE STUDENT FROM BATCH *** \\
 studentRouter.delete(
   "/:student_id/remove/:batch_id",
   logInAuth,

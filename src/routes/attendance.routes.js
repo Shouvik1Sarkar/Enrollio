@@ -7,6 +7,7 @@ import { createAttendance } from "../controller/attendance.controller.js";
 
 const attendanceRouter = Router();
 
+// *** CREATE ATTENDANCE *** \\
 attendanceRouter.post("/", createAttendance);
 
 export default attendanceRouter;

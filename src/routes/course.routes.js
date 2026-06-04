@@ -18,25 +18,34 @@ const super_admin = available_user_roles.SUPER_ADMIN;
 const teacher = available_user_roles.TEACHER;
 const student = available_user_roles.STUDENT;
 
+// *** CREATE COURSE *** \\
 courseRouter.post(
   "/create-course",
   logInAuth,
   authorizeRoles(super_admin),
   createCourse,
 );
+
+// *** DELETE COURSE *** \\
 courseRouter.delete(
   "/delete/:course_id",
   logInAuth,
   authorizeRoles(super_admin),
   deleteCourse,
 );
+
+// *** GET ALL COURSES *** \\
 courseRouter.get(
   "/all",
   logInAuth,
   authorizeRoles(super_admin, admin, teacher),
   getAllCourses,
 );
+
+// *** GET COURSE BY ID *** \\
 courseRouter.get("/:course_id", logInAuth, getCourseById); // get one course + its batches
+
+// *** UPDATE COURSE *** \\
 courseRouter.patch(
   "/:course_id",
   logInAuth,
