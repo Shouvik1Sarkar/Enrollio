@@ -151,6 +151,11 @@ export const deleteMarks = asyncHandler(async (req, res) => {
   }
 
   await marks.deleteOne();
+  try {
+    await redisClient.del(`marks_id:${marks_id}`);
+  } catch (error) {
+    logger.error(error);
+  }
 
   return res.status(200).json(new ApiResponse(200, null, "Marks deleted."));
 });
