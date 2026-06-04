@@ -290,6 +290,22 @@ export const getMarksById = asyncHandler(async (req, res) => {
   }
   const { marks_id } = req.params;
 
+  const userId = req.user._id;
+  const cachedKey = `marks_id:${marks_id}`;
+  let cachedMe;
+
+  try {
+    cachedMe = await redisClient.get(cachedKey);
+  } catch (err) {
+    console.log("Redis error, fallback to DB");
+  }
+
+  if (cachedMe) {
+    return res
+      .status(200)
+      .json(new ApiResponse(200, JSON.parse(cachedMe), "*Marks by ID.*"));
+  }
+
   const mark = await Marks.findById(marks_id)
     .populate({
       path: "student",
@@ -307,5 +323,11 @@ export const getMarksById = asyncHandler(async (req, res) => {
     throw new ApiError(404, "Marks not found.");
   }
 
-  return res.status(200).json(new ApiResponse(200, mark, "My Marks."));
+  try {
+    await redisClient.setEx(cachedKey, 60 * 20, JSON.stringify(mark));
+  } catch (err) {
+    console.log("Redis set failed");
+  }
+
+  return res.status(200).json(new ApiResponse(200, mark, "Marks by ID."));
 });
