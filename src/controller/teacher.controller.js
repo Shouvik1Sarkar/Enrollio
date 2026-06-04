@@ -8,6 +8,8 @@ import ApiResponse from "../utils/ApiResponse.utils.js";
 import asyncHandler from "../utils/asyncHandler.utils.js";
 import { available_user_roles } from "../utils/constants.utils.js";
 
+// ***SET-UP TEACHER*** \\
+
 export const setupTeacherProfile = asyncHandler(async (req, res) => {
   const myUser = req.user;
 
@@ -49,6 +51,8 @@ export const setupTeacherProfile = asyncHandler(async (req, res) => {
     .json(new ApiResponse(201, teacher, "Teacher Created."));
 });
 
+// ***UPDATE TEACHER*** \\
+
 export const updateTeacher = asyncHandler(async (req, res) => {
   const myUser = req.user;
 
@@ -88,7 +92,7 @@ export const updateTeacher = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, userTeacher, "Teacher updated."));
 });
 
-// ***UPDATE SALARY***
+// ***UPDATE SALARY*** \\
 
 export const updateSalary = asyncHandler(async (req, res) => {
   const user = req.user;
@@ -113,6 +117,8 @@ export const updateSalary = asyncHandler(async (req, res) => {
     .status(200)
     .json(new ApiResponse(200, teacher, "Teacher Salary upsated."));
 });
+
+// ***GET MY BATCHES*** \\
 
 export const getMyBatches = asyncHandler(async (req, res) => {
   const user = req.user;
@@ -161,6 +167,8 @@ export const getMyBatches = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, batch.enrolledBatches, "All My Batches."));
 });
 
+// ***ASSIGN TEACHER TO BATCH*** \\
+
 export const assignTeacherToBatch = asyncHandler(async (req, res) => {
   const user = req.user;
   if (!user) {
@@ -202,6 +210,8 @@ export const assignTeacherToBatch = asyncHandler(async (req, res) => {
     .status(200)
     .json(new ApiResponse(200, null, "Teacher assigned to batch."));
 });
+
+// ***GET TEACHER BY ID*** \\
 
 export const getTeacherById = asyncHandler(async (req, res) => {
   const user = req.user;
@@ -245,6 +255,8 @@ export const getTeacherById = asyncHandler(async (req, res) => {
 
 // });
 
+// ***DELETE TEACHER*** \\
+
 export const deleteTeacher = asyncHandler(async (req, res) => {
   const user = req.user;
   if (!user) {
@@ -272,6 +284,8 @@ export const deleteTeacher = asyncHandler(async (req, res) => {
 
   return res.status(200).json(new ApiResponse(200, null, "Teacher deleted."));
 });
+
+// ***REMOVE TEACHER FROM BATCH*** \\
 
 export const removeTeacherFromBatch = asyncHandler(async (req, res) => {
   const myUser = req.user;
