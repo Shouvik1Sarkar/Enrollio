@@ -112,6 +112,8 @@ export const updateUser = asyncHandler(async (req, res) => {
   try {
     await redisClient.del(`Me:${userId}`);
     await redisClient.del(`users:all`);
+    await redisClient.del(`user_by_id:${user_id}`);
+    await redisClient.del(`user_by_name:${change_user.userName}`);
   } catch (error) {
     console.error("Redis del failed:", error);
   }
@@ -200,8 +202,10 @@ export const deleteUser = asyncHandler(async (req, res) => {
   try {
     await redisClient.del(`users:all`);
     await redisClient.del(`Me:${user_id}`);
+    await redisClient.del(`user_by_id:${user_id}`);
+    await redisClient.del(`user_by_name:${change_user.userName}`);
   } catch (error) {
-    logger.error("Error redis");
+    logger.error(error, "Redis del failed on updateUserRole");
   }
 
   return res
@@ -300,8 +304,10 @@ export const updateUserRole = asyncHandler(async (req, res) => {
   try {
     await redisClient.del(`Me:${user_id}`);
     await redisClient.del(`users:all`);
+    await redisClient.del(`user_by_id:${user_id}`);
+    await redisClient.del(`user_by_name:${change_user.userName}`);
   } catch (error) {
-    console.error("Redis del failed:", error);
+    logger.error(error, "Redis del failed on updateUserRole");
   }
   // }
 
@@ -314,52 +320,50 @@ export const updateUserRole = asyncHandler(async (req, res) => {
 
 export const getUserById = asyncHandler(async (req, res) => {
   const myUser = req.user;
-  if (!myUser) {
-    throw new ApiError(401, "Authentication required.");
-  }
-
-  // const userId = req.user?._id;
-
-  // const myUser = await User.findById(userId).select("-password -refreshToken");
-
-  // if (!myUser) {
-  //   throw new ApiError(401, "User not found");
-  // }
+  if (!myUser) throw new ApiError(401, "Authentication required.");
 
   if (
     myUser.role === available_user_roles.STUDENT ||
     myUser.role === available_user_roles.TEACHER
   ) {
-    throw new ApiError(
-      403,
-      "Students and teachers are not authorized to access this resource.",
-    );
+    throw new ApiError(403, "Students and teachers are not authorized.");
   }
 
   const { user_id } = req.params;
+  if (!user_id) throw new ApiError(400, "User ID is required."); // ← before cache
 
-  if (!user_id) {
-    throw new ApiError(400, "User ID is required.");
+  const cachedKey = `user_by_id:${user_id}`;
+  let cachedMe;
+
+  try {
+    cachedMe = await redisClient.get(cachedKey);
+  } catch (err) {
+    logger.error(err, "Redis get error on getUserById"); // ← logger
+  }
+
+  if (cachedMe) {
+    return res
+      .status(200)
+      .json(new ApiResponse(200, JSON.parse(cachedMe), "User found."));
   }
 
   const user = await User.findById(user_id).select("-password -refreshToken");
-
-  if (!user) {
-    throw new ApiError(404, "User not found.");
-  }
+  if (!user) throw new ApiError(404, "User not found.");
 
   const response_data = { ...user.toObject() };
 
-  // STUDENT
-
   if (user.role === available_user_roles.STUDENT) {
-    const student = await Student.findOne({
-      userId: user._id,
-    })
+    const student = await Student.findOne({ userId: user._id })
       .select("-createdBy -__v")
       .populate("enrolledBatches", "name course");
 
     response_data.student_data = student;
+  }
+
+  try {
+    await redisClient.setEx(cachedKey, 60 * 20, JSON.stringify(response_data));
+  } catch (err) {
+    logger.error(err, "Redis set error on getUserById"); // ← logger
   }
 
   return res
@@ -371,17 +375,7 @@ export const getUserById = asyncHandler(async (req, res) => {
 
 export const getUserByUserName = asyncHandler(async (req, res) => {
   const myUser = req.user;
-  if (!myUser) {
-    throw new ApiError(401, "Authentication required.");
-  }
-
-  // const userId = req.user?._id;
-
-  // const myUser = await User.findById(userId).select("-password -refreshToken");
-
-  // if (!myUser) {
-  //   throw new ApiError(401, "User not found");
-  // }
+  if (!myUser) throw new ApiError(401, "Authentication required.");
 
   if (myUser.role === available_user_roles.STUDENT) {
     throw new ApiError(
@@ -391,17 +385,32 @@ export const getUserByUserName = asyncHandler(async (req, res) => {
   }
 
   const { user_name } = req.body;
+  if (!user_name) throw new ApiError(400, "Username is required.");
 
-  if (!user_name) {
-    throw new ApiError(400, "Username is required.");
+  const cachedKey = `user_by_name:${user_name}`;
+  let cachedMe;
+
+  try {
+    cachedMe = await redisClient.get(cachedKey);
+  } catch (err) {
+    logger.error(err, "Redis get error on getUserByUserName");
   }
 
-  const user = await User.findOne({
-    userName: user_name,
-  }).select("-password -refreshToken");
+  if (cachedMe) {
+    return res
+      .status(200)
+      .json(new ApiResponse(200, JSON.parse(cachedMe), "User found."));
+  }
 
-  if (!user) {
-    throw new ApiError(404, "User not found.");
+  const user = await User.findOne({ userName: user_name }).select(
+    "-password -refreshToken",
+  );
+  if (!user) throw new ApiError(404, "User not found.");
+
+  try {
+    await redisClient.setEx(cachedKey, 60 * 20, JSON.stringify(user));
+  } catch (err) {
+    logger.error(err, "Redis set error on getUserByUserName");
   }
 
   return res.status(200).json(new ApiResponse(200, user, "User found."));
