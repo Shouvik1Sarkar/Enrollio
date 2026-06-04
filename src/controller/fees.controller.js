@@ -6,6 +6,8 @@ import ApiError from "../utils/ApiError.utils.js";
 import ApiResponse from "../utils/ApiResponse.utils.js";
 import asyncHandler from "../utils/asyncHandler.utils.js";
 
+// *** ADD FEE RECORD *** \\
+
 export const addFeeRecord = asyncHandler(async (req, res) => {
   const user = req.user;
   if (!user) {
@@ -62,6 +64,8 @@ export const addFeeRecord = asyncHandler(async (req, res) => {
     .status(201)
     .json(new ApiResponse(201, student1.feeHistory, "Fee records added."));
 });
+
+// *** ADD SINGLE FEE RECORD *** \\
 
 export const addSingleFeeRecord = asyncHandler(async (req, res) => {
   const user = req.user;
@@ -142,6 +146,8 @@ export const addSingleFeeRecord = asyncHandler(async (req, res) => {
     .json(new ApiResponse(201, student1.feeHistory, "Fee records added."));
 });
 
+// *** FEE BY ID *** \\
+
 export const feeById = asyncHandler(async (req, res) => {
   const user = req.user;
   if (!user) {
@@ -166,6 +172,8 @@ export const feeById = asyncHandler(async (req, res) => {
 
   return res.status(200).json(new ApiResponse(200, fee, "Fee found."));
 });
+
+// *** MARK FEE PAID *** \\
 
 export const markFeePaid = asyncHandler(async (req, res) => {
   const user = req.user;
@@ -203,6 +211,8 @@ export const markFeePaid = asyncHandler(async (req, res) => {
     .status(200)
     .json(new ApiResponse(200, student.feeHistory, "Fee marked as paid."));
 });
+
+// *** MARK EACH FEE PAID *** \\
 
 export const markEachFeePaid = asyncHandler(async (req, res) => {
   const user = req.user;
@@ -246,6 +256,8 @@ export const markEachFeePaid = asyncHandler(async (req, res) => {
   return res.status(200).json(new ApiResponse(200, fees, "fees paid."));
 });
 
+// *** GET STUDENT FEE HISTORY *** \\
+
 export const getStudentFeeHistory = asyncHandler(async (req, res) => {
   const user = req.user;
 
@@ -267,6 +279,8 @@ export const getStudentFeeHistory = asyncHandler(async (req, res) => {
     .status(200)
     .json(new ApiResponse(200, student.feeHistory, "Fee History."));
 });
+
+// *** GET STUDENT BALANCE *** \\
 
 export const getStudentBalance = asyncHandler(async (req, res) => {
   const user = req.user;
@@ -324,35 +338,7 @@ export const getStudentBalance = asyncHandler(async (req, res) => {
   );
 });
 
-// export const deleteFeeRecord = asyncHandler(async (req, res) => {
-//   const { student_id, fee_id } = req.params;
-
-//   const astudent = await Student.findById(student_id);
-
-//   if (!astudent) {
-//     throw new ApiError(400, "Student not found.");
-//   }
-
-//   const fee = await astudent.feeHistory.id(fee_id);
-//   if (!fee) {
-//     throw new ApiError(400, "Fee not found");
-//   }
-
-//   const student = await Student.findByIdAndUpdate(student_id, {
-//     $inc: { total_fees: -fee.amount },
-//   });
-//   if (!student) throw new ApiError(404, "Student not found.");
-
-//   const feeRecord = student.feeHistory.id(fee_id);
-//   if (!feeRecord) throw new ApiError(404, "Fee record not found.");
-
-//   student.feeHistory.pull({ _id: fee_id });
-//   await student.save({ validateBeforeSave: false });
-
-//   return res
-//     .status(200)
-//     .json(new ApiResponse(200, null, "Fee record deleted."));
-// });
+// *** DELETE FEE RECORD *** \\
 
 export const deleteFeeRecord = asyncHandler(async (req, res) => {
   const user = req.user;

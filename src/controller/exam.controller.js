@@ -5,6 +5,8 @@ import ApiError from "../utils/ApiError.utils.js";
 import ApiResponse from "../utils/ApiResponse.utils.js";
 import asyncHandler from "../utils/asyncHandler.utils.js";
 
+// *** CREATE EXAM *** \\
+
 export const createExam = asyncHandler(async (req, res) => {
   const user = req.user;
 
@@ -50,6 +52,8 @@ export const createExam = asyncHandler(async (req, res) => {
   return res.status(201).json(new ApiResponse(201, exam, "Exam created."));
 });
 
+// *** GET EXAM BY ID *** \\
+
 export const getExamById = asyncHandler(async (req, res) => {
   const user = req.user;
 
@@ -91,6 +95,8 @@ export const getExamById = asyncHandler(async (req, res) => {
 
   return res.status(200).json(new ApiResponse(200, exam, "Exam details."));
 });
+
+// *** UPDATE EXAM *** \\
 
 export const updateExam = asyncHandler(async (req, res) => {
   const user = req.user;
@@ -135,6 +141,8 @@ export const updateExam = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, updateExam, "Exam data updated."));
 });
 
+// *** DELETE EXAM *** \\
+
 export const deleteExam = asyncHandler(async (req, res) => {
   const user = req.user;
 
@@ -154,6 +162,8 @@ export const deleteExam = asyncHandler(async (req, res) => {
 
   return res.status(200).json(new ApiResponse(200, null, "Exam deleted."));
 });
+
+// *** GET EXAM BY BATCH *** \\
 
 export const getExamsByBatch = asyncHandler(async (req, res) => {
   const user = req.user;

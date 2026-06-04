@@ -9,6 +9,8 @@ import ApiResponse from "../utils/ApiResponse.utils.js";
 import asyncHandler from "../utils/asyncHandler.utils.js";
 import logger from "../utils/logger.utils.js";
 
+// *** CREATE MARKS *** \\
+
 export const createMarks = asyncHandler(async (req, res) => {
   const user = req.user;
 
@@ -101,6 +103,8 @@ export const createMarks = asyncHandler(async (req, res) => {
    */
 });
 
+// *** UPDATE MARKS *** \\
+
 export const updateMarks = asyncHandler(async (req, res) => {
   const user = req.user;
 
@@ -135,6 +139,8 @@ export const updateMarks = asyncHandler(async (req, res) => {
   return res.status(200).json(new ApiResponse(200, marks, "Marks Updated."));
 });
 
+// *** DELETE MARKS *** \\
+
 export const deleteMarks = asyncHandler(async (req, res) => {
   const user = req.user;
 
@@ -159,6 +165,8 @@ export const deleteMarks = asyncHandler(async (req, res) => {
 
   return res.status(200).json(new ApiResponse(200, null, "Marks deleted."));
 });
+
+// *** GET MARKS BY EXAM *** \\
 
 export const getMarksByExam = asyncHandler(async (req, res) => {
   const user = req.user;
@@ -223,6 +231,8 @@ export const getMarksByExam = asyncHandler(async (req, res) => {
   return res.status(200).json(new ApiResponse(200, marks, "Marks by Exams."));
 });
 
+// *** GET MARKS BY STUDENT *** \\
+
 export const getMarksByStudent = asyncHandler(async (req, res) => {
   const user = req.user;
 
@@ -242,6 +252,8 @@ export const getMarksByStudent = asyncHandler(async (req, res) => {
 
   return res.status(200).json(new ApiResponse(200, marks, "All Marks."));
 });
+
+// *** GET MY MARKS *** \\
 
 export const getMyMarks = asyncHandler(async (req, res) => {
   const user = req.user;
@@ -286,6 +298,8 @@ export const getMyMarks = asyncHandler(async (req, res) => {
 
   return res.status(200).json(new ApiResponse(200, marks, "My Marks."));
 });
+
+// *** GET MARKS BY ID*** \\
 
 export const getMarksById = asyncHandler(async (req, res) => {
   const user = req.user;

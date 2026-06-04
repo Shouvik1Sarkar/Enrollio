@@ -12,6 +12,7 @@ import {
 } from "../utils/constants.utils.js";
 import logger from "../utils/logger.utils.js";
 
+// *** GET USER *** \\
 export const getUser = asyncHandler(async (req, res) => {
   // console.log("MY USER.");
   const myUser = req.user;
@@ -76,6 +77,8 @@ export const getUser = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, response_data, "User Found."));
 });
 
+// *** UPDATE USER *** \\
+
 export const updateUser = asyncHandler(async (req, res) => {
   const myUser = req.user;
   if (!myUser) {
@@ -122,25 +125,7 @@ export const updateUser = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, updatedUser, "User updated successfully."));
 });
 
-// export const deleteUser = asyncHandler(async (req, res) => {
-//   if (!req.user) {
-//     throw new ApiError(401, "Not logged in.");
-//   }
-
-//   const userId = req.user?._id;
-
-//   const myUser = await User.findById(userId).select("-password -refreshToken");
-
-//   if (myUser.role !== available_user_roles.SUPER_ADMIN) {
-//     throw new ApiError(401, null, "Only super admin can delete an account");
-//   }
-
-//   const { user_id } = req.params;
-
-//   await User.findByIdAndDelete(user_id);
-
-//   return res.status(200).json(new ApiResponse(200, null, "User deleted."));
-// });
+// *** DELETE USER *** \\
 
 export const deleteUser = asyncHandler(async (req, res) => {
   const loggedInUser = req.user;
@@ -213,6 +198,8 @@ export const deleteUser = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, null, "User deleted successfully"));
 });
 
+// *** ALL USERS *** \\
+
 export const allUsers = asyncHandler(async (req, res) => {
   const myUser = req.user;
   if (!myUser) {
@@ -261,6 +248,8 @@ export const allUsers = asyncHandler(async (req, res) => {
 
   return res.status(200).json(new ApiResponse(200, allUsers, "All Users."));
 });
+
+// *** UPDATE USER ROLE *** \\
 
 export const updateUserRole = asyncHandler(async (req, res) => {
   const myUser = req.user;
@@ -318,6 +307,7 @@ export const updateUserRole = asyncHandler(async (req, res) => {
 
 // Might change to only SUPER_ADMIN CAN DO THIS.
 
+// *** GET USER BY ID *** \\
 export const getUserById = asyncHandler(async (req, res) => {
   const myUser = req.user;
   if (!myUser) throw new ApiError(401, "Authentication required.");
@@ -372,6 +362,8 @@ export const getUserById = asyncHandler(async (req, res) => {
 });
 
 // Might change to only SUPER_ADMIN CAN DO THIS.
+
+// *** GET USER BY USER NAME *** \\
 
 export const getUserByUserName = asyncHandler(async (req, res) => {
   const myUser = req.user;

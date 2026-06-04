@@ -15,6 +15,8 @@ import logger from "../utils/logger.utils.js";
 import { REFRESH_TOKEN_SECRET } from "../../config/env.config.js";
 import redisClient from "../../config/redis.config.js";
 
+// *** GET ALL BATCH *** \\
+
 export const createFirstUser = asyncHandler(async (req, res) => {
   const { name, userName, email, password } = req.body;
 
@@ -84,6 +86,8 @@ export const createFirstUser = asyncHandler(async (req, res) => {
     );
 });
 
+// *** SEND EMAIL VERIFICATION OTP *** \\
+
 export const sendEmailVerificationOTP = asyncHandler(async (req, res) => {
   const { email } = req.body;
 
@@ -120,6 +124,8 @@ export const sendEmailVerificationOTP = asyncHandler(async (req, res) => {
     .status(200)
     .json(new ApiResponse(200, null, "OTP sent successfully"));
 });
+
+// *** VERIFY EMAIL *** \\
 
 export const verifyEmail = asyncHandler(async (req, res) => {
   const { otp } = req.body;
@@ -158,6 +164,8 @@ export const verifyEmail = asyncHandler(async (req, res) => {
     .status(200)
     .json(new ApiResponse(200, verifiedUser, "Email verified successfully"));
 });
+
+// *** CREATE USER *** \\
 
 export const createUser = asyncHandler(async (req, res) => {
   const { name, userName, email, password, role } = req.body;
@@ -240,6 +248,8 @@ export const createUser = asyncHandler(async (req, res) => {
     .json(new ApiResponse(201, finalUser, "User created successfully"));
 });
 
+// *** LOG IN USER *** \\
+
 export const logInUser = asyncHandler(async (req, res) => {
   const { email, userName, password } = req.body;
 
@@ -301,6 +311,8 @@ export const logInUser = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, userResult, "Logged In."));
 });
 
+// *** LOG OUT USER *** \\
+
 export const logOutUser = asyncHandler(async (req, res) => {
   if (!req.user) {
     throw new ApiError(401, "Not logged in.");
@@ -314,6 +326,8 @@ export const logOutUser = asyncHandler(async (req, res) => {
     .clearCookie("refreshToken")
     .json(new ApiResponse(200, null, "Logged Out"));
 });
+
+// *** FORGOT PASSWORD *** \\
 
 export const forgotPassword = asyncHandler(async (req, res) => {
   const { email, userName } = req.body;
@@ -341,6 +355,8 @@ export const forgotPassword = asyncHandler(async (req, res) => {
 
   return res.status(200).json(new ApiResponse(200, null, "Otp Sent"));
 });
+
+// *** SET FORGET PASSWORD *** \\
 
 export const setForgetPassword = asyncHandler(async (req, res) => {
   const { otp, newPassword, confirmNewPassword } = req.body;
@@ -388,6 +404,8 @@ export const setForgetPassword = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, null, "Password updated successfully."));
 });
 
+// *** CHANGE PASSWORD *** \\
+
 export const changePassword = asyncHandler(async (req, res) => {
   const { password, newPassword, confirmNewPassword } = req.body;
 
@@ -418,6 +436,8 @@ export const changePassword = asyncHandler(async (req, res) => {
     .status(200)
     .json(new ApiResponse(200, null, "Password updated successfully."));
 });
+
+// *** REFRESH TOKEN *** \\
 
 export const refreshToken = asyncHandler(async (req, res) => {
   const incomingRefreshToken = req.cookies.refreshToken;

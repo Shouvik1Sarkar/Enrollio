@@ -2,6 +2,8 @@ import Attendance from "../models/attendance.models.js";
 import ApiError from "../utils/ApiError.utils.js";
 import asyncHandler from "../utils/asyncHandler.utils.js";
 
+// *** CREATE ATTENDANCE *** \\
+
 export const createAttendance = asyncHandler(async (req, res) => {
   const user = req.user;
 

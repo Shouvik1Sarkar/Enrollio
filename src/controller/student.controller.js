@@ -52,6 +52,8 @@ export const setupStudentProfile = asyncHandler(async (req, res) => {
     );
 });
 
+// *** GET ALL STUDENTS *** \\
+
 export const getAllStudents = asyncHandler(async (req, res) => {
   const myUser = req.user;
 
@@ -93,6 +95,8 @@ export const getAllStudents = asyncHandler(async (req, res) => {
     .status(200)
     .json(new ApiResponse(200, all_students, "All students."));
 });
+
+// *** ENROLL STUDENT IN BATCHE *** \\
 
 export const enrollStudentInBatch = asyncHandler(async (req, res) => {
   const myUser = req.user;
@@ -173,6 +177,8 @@ export const enrollStudentInBatch = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, null, "Student enrolled successfully"));
 });
 
+// *** GET STUDENTS BY ID *** \\
+
 export const getStudentById = asyncHandler(async (req, res) => {
   const myUser = req.user;
 
@@ -195,6 +201,8 @@ export const getStudentById = asyncHandler(async (req, res) => {
 
   return res.status(200).json(new ApiResponse(200, student, "Student."));
 });
+
+// *** UPDATE STUDENT PROFILE *** \\
 
 export const updateStudentProfile = asyncHandler(async (req, res) => {
   const myUser = req.user;
@@ -245,6 +253,8 @@ export const updateStudentProfile = asyncHandler(async (req, res) => {
     .status(200)
     .json(new ApiResponse(200, updated_student, "Students updated."));
 });
+
+// *** REMOVE STUDENT FROM BATCH *** \\
 
 export const removeStudentFromBatch = asyncHandler(async (req, res) => {
   const myUser = req.user;
@@ -315,6 +325,8 @@ export const removeStudentFromBatch = asyncHandler(async (req, res) => {
     );
 });
 
+// *** GET ME *** \\
+
 export const getMe = asyncHandler(async (req, res) => {
   const user = req.user;
 
@@ -336,6 +348,8 @@ export const getMe = asyncHandler(async (req, res) => {
 
   return res.status(200).json(new ApiResponse(200, findUser, "ME."));
 });
+
+// *** MY FEES *** \\
 
 export const my_fees = asyncHandler(async (req, res) => {
   const user = req.user;
@@ -394,6 +408,8 @@ export const my_fees = asyncHandler(async (req, res) => {
     ),
   );
 });
+
+// *** MY MARKS *** \\
 
 export const my_marks = asyncHandler(async (req, res) => {
   const user = req.user;

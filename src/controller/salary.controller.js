@@ -10,6 +10,8 @@ import ApiResponse from "../utils/ApiResponse.utils.js";
 import asyncHandler from "../utils/asyncHandler.utils.js";
 import logger from "../utils/logger.utils.js";
 
+// *** SET SALARY *** \\
+
 export const set_salary = asyncHandler(async (req, res) => {
   const user = req.user;
   if (!user) {
@@ -79,6 +81,8 @@ export const set_salary = asyncHandler(async (req, res) => {
   return res.status(200).json(new ApiResponse(200, salary, "Salary created."));
 });
 
+// *** PAID SALARY *** \\
+
 export const paid_salary = asyncHandler(async (req, res) => {
   const user = req.user;
   if (!user) {
@@ -137,6 +141,8 @@ export const paid_salary = asyncHandler(async (req, res) => {
 
   return res.status(201).json(new ApiResponse(201, salary, "salary paid."));
 });
+
+// *** SALARY HISTORY *** \\
 
 export const salary_history = asyncHandler(async (req, res) => {
   const user = req.user;
@@ -211,6 +217,8 @@ export const salary_history = asyncHandler(async (req, res) => {
   );
 });
 
+// *** GET ALL SALARIES *** \\
+
 export const getAllSalaries = asyncHandler(async (req, res) => {
   const user = req.user;
 
@@ -229,6 +237,8 @@ export const getAllSalaries = asyncHandler(async (req, res) => {
 
   return res.status(200).json(new ApiResponse(200, salaries, "Salary found."));
 });
+
+// *** DELETE SALARY RECORD *** \\
 
 export const deleteSalaryRecord = asyncHandler(async (req, res) => {
   const user = req.user;
@@ -256,22 +266,7 @@ export const deleteSalaryRecord = asyncHandler(async (req, res) => {
   return res.status(200).json(new ApiResponse(200, salaries, "Salary found."));
 });
 
-// export const deleteSalaryRecord = asyncHandler(async (req, res) => {
-//   // ← fix name
-//   const user = req.user;
-//   if (!user) throw new ApiError(401, "User not logged in.");
-
-//   const { salary_id } = req.params;
-
-//   const salary = await Salary.findById(salary_id);
-//   if (!salary) throw new ApiError(404, "Salary not found.");
-
-//   await salary.deleteOne(); // cleaner than findByIdAndDelete after already fetching
-
-//   return res
-//     .status(200)
-//     .json(new ApiResponse(200, null, "Salary record deleted."));
-// });
+// *** MY SALARY *** \\
 
 export const my_salary = asyncHandler(async (req, res) => {
   const user = req.user;

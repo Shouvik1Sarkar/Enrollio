@@ -12,6 +12,8 @@ import {
 } from "../utils/constants.utils.js";
 import logger from "../utils/logger.utils.js";
 
+// *** CREATE BATCH *** \\
+
 export const createBatch = asyncHandler(async (req, res) => {
   const user = req.user;
 
@@ -81,6 +83,8 @@ export const createBatch = asyncHandler(async (req, res) => {
   return res.status(201).json(new ApiResponse(201, batch, "COURSE CREATED."));
 });
 
+// *** GET ALL BATCHES *** \\
+
 export const getAllBatches = asyncHandler(async (req, res) => {
   const myUser = req.user;
 
@@ -105,6 +109,8 @@ export const getAllBatches = asyncHandler(async (req, res) => {
 
   return res.status(200).json(new ApiResponse(200, allBatches, "All batches."));
 });
+
+// *** GET BATCH BY ID *** \\
 
 export const getBatchById = asyncHandler(async (req, res) => {
   const user = req.user;
@@ -145,6 +151,8 @@ export const getBatchById = asyncHandler(async (req, res) => {
 
   return res.status(200).json(new ApiResponse(200, batch, "Batch found."));
 });
+
+// *** UPDATE BATCH *** \\
 
 export const updateBatch = asyncHandler(async (req, res) => {
   const user = req.user;
@@ -208,6 +216,8 @@ export const updateBatch = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, updatedBatch, "Batch Updated."));
 });
 
+// *** DELETE BATCH *** \\
+
 export const deleteBatch = asyncHandler(async (req, res) => {
   const myUser = req.user;
 
@@ -233,6 +243,8 @@ export const deleteBatch = asyncHandler(async (req, res) => {
 
   return res.status(200).json(new ApiResponse(200, null, "deleted"));
 });
+
+// *** REMOVE STUDENT *** \\
 
 export const removeStudent = asyncHandler(async (req, res) => {
   const myUser = req.user;
@@ -288,6 +300,8 @@ export const removeStudent = asyncHandler(async (req, res) => {
       new ApiResponse(200, null, "Student removed from batch successfully"),
     );
 });
+
+// *** ALL STUDENT OF BATCH *** \\
 
 export const allStudentsOfBatch = asyncHandler(async (req, res) => {
   const myUser = req.user;

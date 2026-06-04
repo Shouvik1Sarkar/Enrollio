@@ -5,6 +5,8 @@ import asyncHandler from "../utils/asyncHandler.utils.js";
 import { available_user_roles, boards_enum } from "../utils/constants.utils.js";
 import User from "../models/user.models.js";
 
+// *** CREATE COURSE *** \\
+
 export const createCourse = asyncHandler(async (req, res) => {
   const myUser = req.user;
 
@@ -72,6 +74,8 @@ export const createCourse = asyncHandler(async (req, res) => {
     .json(new ApiResponse(201, newCourse, "Course created successfully"));
 });
 
+// *** DELETE COURSE *** \\
+
 export const deleteCourse = asyncHandler(async (req, res) => {
   const myUser = req.user;
 
@@ -98,6 +102,8 @@ export const deleteCourse = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, null, "Course deleted successfully"));
 });
 
+// *** GET ALL COURSES *** \\
+
 export const getAllCourses = asyncHandler(async (req, res) => {
   const myUser = req.user;
 
@@ -113,6 +119,8 @@ export const getAllCourses = asyncHandler(async (req, res) => {
 
   return res.status(200).json(new ApiResponse(200, allCourses, "All Courses."));
 });
+
+// *** GET COURSE BY ID *** \\
 
 export const getCourseById = asyncHandler(async (req, res) => {
   const myUser = req.user;
@@ -131,6 +139,8 @@ export const getCourseById = asyncHandler(async (req, res) => {
 
   return res.status(200).json(new ApiResponse(200, course, "Course found."));
 });
+
+// *** UPDATE COURSE *** \\
 
 export const updateCourse = asyncHandler(async (req, res) => {
   const myUser = req.user;
