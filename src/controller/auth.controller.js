@@ -27,13 +27,13 @@ export const createFirstUser = asyncHandler(async (req, res) => {
   }
 
   // only one super admin allowed
-  // const superAdminExists = await User.findOne({
-  //   role: available_user_roles.SUPER_ADMIN,
-  // });
+  const superAdminExists = await User.findOne({
+    role: available_user_roles.SUPER_ADMIN,
+  });
 
-  // if (superAdminExists) {
-  //   throw new ApiError(409, "Super admin already exists");
-  // }
+  if (superAdminExists) {
+    throw new ApiError(409, "Super admin already exists");
+  }
 
   const existedUser = await User.findOne({
     $or: [{ email }, { userName }],

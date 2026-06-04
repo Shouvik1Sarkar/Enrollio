@@ -44,7 +44,10 @@ const arcjetMiddleware = async (req, res, next) => {
 
     // If Arcjet itself is broken, decide: allow or block?
     // Option 1: Fail open (allow request)
-    next();
+
+    //******************************** */
+    // next();
+    //******************************** */
 
     // Option 2: Fail closed (block request) - more secure
     // throw new ApiError(500, "Security check failed");

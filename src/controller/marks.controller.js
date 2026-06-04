@@ -71,10 +71,10 @@ export const createMarks = asyncHandler(async (req, res) => {
 
   const marks = await Marks.create({
     batch: batch_id,
-    testType,
+    // testType,
     student: student._id,
     exam: exam_id,
-    testName,
+    // testName,
     marksObtained,
     // maxMarks,
     remarks,
