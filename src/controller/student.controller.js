@@ -1,3 +1,4 @@
+import redisClient from "../../config/redis.config.js";
 import Batch from "../models/batch.models.js";
 import Marks from "../models/marks.models.js";
 import Salary from "../models/salary.models.js";
@@ -7,6 +8,9 @@ import ApiError from "../utils/ApiError.utils.js";
 import ApiResponse from "../utils/ApiResponse.utils.js";
 import asyncHandler from "../utils/asyncHandler.utils.js";
 import { available_user_roles } from "../utils/constants.utils.js";
+import logger from "../utils/logger.utils.js";
+
+// *** SET UP STUDENT PROFILE *** \\
 
 export const setupStudentProfile = asyncHandler(async (req, res) => {
   const myUser = req.user;
@@ -59,9 +63,31 @@ export const getAllStudents = asyncHandler(async (req, res) => {
     throw new ApiError(403, "You are not authorized to access this resource.");
   }
 
+  const userId = req.user._id;
+  const cachedKey = `all:students`;
+  let cachedMe;
+
+  try {
+    cachedMe = await redisClient.get(cachedKey);
+  } catch (err) {
+    console.log("Redis error, fallback to DB");
+  }
+
+  if (cachedMe) {
+    return res
+      .status(200)
+      .json(new ApiResponse(200, JSON.parse(cachedMe), "*ALL STUDENTS.*"));
+  }
+
   const all_students = await Student.find()
     .populate("userId", "name userName email isActive role avatar")
     .populate("enrolledBatches", "name course teacher learningMode");
+
+  try {
+    await redisClient.setEx(cachedKey, 60 * 20, JSON.stringify(all_students));
+  } catch (err) {
+    console.log("Redis set failed");
+  }
 
   return res
     .status(200)
@@ -135,6 +161,12 @@ export const enrollStudentInBatch = asyncHandler(async (req, res) => {
   });
 
   await student.save({ validateBeforeSave: false });
+
+  try {
+    await redisClient.del(`all:students`);
+  } catch (error) {
+    logger.error(error);
+  }
 
   return res
     .status(200)

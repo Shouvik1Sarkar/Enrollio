@@ -1,3 +1,4 @@
+import redisClient from "../../config/redis.config.js";
 import Batch from "../models/batch.models.js";
 import Course from "../models/courses.models.js";
 import Student from "../models/student.models.js";
@@ -306,6 +307,22 @@ export const allStudentsOfBatch = asyncHandler(async (req, res) => {
 
   const { batch_id } = req.params;
 
+  const userId = req.user._id;
+  const cachedKey = `all:students:${batch_id}`;
+  let cachedMe;
+
+  try {
+    cachedMe = await redisClient.get(cachedKey);
+  } catch (err) {
+    console.log("Redis error, fallback to DB");
+  }
+
+  if (cachedMe) {
+    return res
+      .status(200)
+      .json(new ApiResponse(200, JSON.parse(cachedMe), "*ALL STUDENTS.*"));
+  }
+
   const batch = await Batch.findById(batch_id).populate({
     path: "students",
     select: "userId studentType board standard",
@@ -318,6 +335,12 @@ export const allStudentsOfBatch = asyncHandler(async (req, res) => {
 
   if (!batch) {
     throw new ApiError(404, "Batch not found");
+  }
+
+  try {
+    await redisClient.setEx(cachedKey, 60 * 20, JSON.stringify(batch.students));
+  } catch (err) {
+    console.log("Redis set failed");
   }
 
   return res
