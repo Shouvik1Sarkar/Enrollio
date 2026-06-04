@@ -164,13 +164,29 @@ export const getMarksByExam = asyncHandler(async (req, res) => {
 
   const { exam_id } = req.params;
 
+  const userId = req.user._id;
+  const cachedKey = `exam_marks:${exam_id}`;
+  let cachedMe;
+
+  try {
+    cachedMe = await redisClient.get(cachedKey);
+  } catch (err) {
+    console.log("Redis error, fallback to DB");
+  }
+
+  if (cachedMe) {
+    return res
+      .status(200)
+      .json(new ApiResponse(200, JSON.parse(cachedMe), "*Marks by Exams.*"));
+  }
+
   const marks = await Marks.find({
     exam: exam_id,
   })
     // .populate("exam", "batch title date totalMarks passingMarks")
     .populate({
       path: "student",
-      select: "",
+      select: "-enrolledBatches -feeHistory",
       populate: {
         path: "userId",
         model: "User",
@@ -193,7 +209,13 @@ export const getMarksByExam = asyncHandler(async (req, res) => {
   //   throw new ApiError(400, "Marks not found.");
   // }
 
-  return res.status(200).json(new ApiResponse(200, marks, "All Marks."));
+  try {
+    await redisClient.setEx(cachedKey, 60 * 20, JSON.stringify(marks));
+  } catch (err) {
+    console.log("Redis set failed");
+  }
+
+  return res.status(200).json(new ApiResponse(200, marks, "Marks by Exams."));
 });
 
 export const getMarksByStudent = asyncHandler(async (req, res) => {
