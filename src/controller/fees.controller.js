@@ -1,3 +1,4 @@
+import redisClient from "../../config/redis.config.js";
 import Batch from "../models/batch.models.js";
 import Exam from "../models/exam.models.js";
 import Student from "../models/student.models.js";
@@ -191,6 +192,12 @@ export const markFeePaid = asyncHandler(async (req, res) => {
     record.note = note ?? null;
   });
   await student.save({ validateBeforeSave: false });
+  try {
+    await redisClient.del(`my_fees:${student._id}`);
+    await redisClient.del(`Me:${student._id}`);
+  } catch (error) {
+    console.error(error);
+  }
 
   return res
     .status(200)
@@ -207,8 +214,7 @@ export const markEachFeePaid = asyncHandler(async (req, res) => {
   const { student_id, fee_id } = req.params;
   const { note } = req.body;
 
-  const student =
-    await Student.findById(student_id).populate("enrolledBatches");
+  const student = await Student.findById(student_id);
 
   if (!student) {
     throw new ApiError(404, "Student not found");
@@ -228,6 +234,13 @@ export const markEachFeePaid = asyncHandler(async (req, res) => {
   fees.collectedBy = user._id;
   fees.note = note ?? null;
   await student.save({ validateBeforeSave: false });
+
+  try {
+    await redisClient.del(`my_fees:${student._id}`);
+    await redisClient.del(`Me:${student._id}`);
+  } catch (error) {
+    console.error(error);
+  }
 
   // return res.status(200).json(new ApiResponse(200, student, "fees paid."));
   return res.status(200).json(new ApiResponse(200, fees, "fees paid."));

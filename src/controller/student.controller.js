@@ -316,6 +316,22 @@ export const my_fees = asyncHandler(async (req, res) => {
     throw new ApiError(403, "Only students can access this resource.");
   }
 
+  const userId = user._id;
+  const cachedKey = `my_fees:${userId}`;
+  let cachedMe;
+
+  try {
+    cachedMe = await redisClient.get(cachedKey);
+  } catch (err) {
+    console.log("Redis error, fallback to DB");
+  }
+
+  if (cachedMe) {
+    return res
+      .status(200)
+      .json(new ApiResponse(200, JSON.parse(cachedMe), "*My fees.*"));
+  }
+
   const student = await Student.findOne({ userId: user._id }).populate(
     "feeHistory.batch",
     "name monthlyFees",
@@ -324,6 +340,15 @@ export const my_fees = asyncHandler(async (req, res) => {
 
   if (!student) {
     throw new ApiError(404, "Student not found.");
+  }
+  const result = {
+    total_fees: student.total_fees,
+    feeHistory: student.feeHistory,
+  };
+  try {
+    await redisClient.setEx(cachedKey, 60 * 20, JSON.stringify(result));
+  } catch (err) {
+    console.log("Redis set failed");
   }
 
   return res.status(200).json(

@@ -1,3 +1,4 @@
+import redisClient from "../../config/redis.config.js";
 import Batch from "../models/batch.models.js";
 import Salary from "../models/salary.models.js";
 import Teacher from "../models/teacher.models.js";
@@ -120,15 +121,44 @@ export const getMyBatches = asyncHandler(async (req, res) => {
     throw new ApiError(401, "Authentication required.");
   }
 
-  const batch = await Teacher.findOne({ userId: user._id });
+  const userId = user._id;
+  const cachedKey = `all_my_batches:${userId}`;
+  let cachedMe;
+
+  try {
+    cachedMe = await redisClient.get(cachedKey);
+  } catch (err) {
+    console.log("Redis error, fallback to DB");
+  }
+
+  if (cachedMe) {
+    return res
+      .status(200)
+      .json(new ApiResponse(200, JSON.parse(cachedMe), "*All My Batches.*"));
+  }
+
+  const batch = await Teacher.findOne({ userId: user._id }).populate(
+    "enrolledBatches",
+    "name course teacher learningMode schedule monthlyFees",
+  );
 
   if (!batch) {
     throw new ApiError(404, "Batch not found.");
   }
 
+  try {
+    await redisClient.setEx(
+      cachedKey,
+      60 * 20,
+      JSON.stringify(batch.enrolledBatches),
+    );
+  } catch (err) {
+    console.log("Redis set failed");
+  }
+
   return res
     .status(200)
-    .json(new ApiResponse(200, batch.enrolledBatches, "Batch updated."));
+    .json(new ApiResponse(200, batch.enrolledBatches, "All My Batches."));
 });
 
 export const assignTeacherToBatch = asyncHandler(async (req, res) => {
