@@ -1,3 +1,4 @@
+import redisClient from "../../config/redis.config.js";
 import Batch from "../models/batch.models.js";
 import Exam from "../models/exam.models.js";
 import ApiError from "../utils/ApiError.utils.js";
@@ -58,12 +59,34 @@ export const getExamById = asyncHandler(async (req, res) => {
 
   const { exam_id } = req.params;
 
+  const userId = user._id;
+  const cachedKey = `exam_id:${exam_id}`;
+  let cachedMe;
+
+  try {
+    cachedMe = await redisClient.get(cachedKey);
+  } catch (err) {
+    console.log("Redis error, fallback to DB");
+  }
+
+  if (cachedMe) {
+    return res
+      .status(200)
+      .json(new ApiResponse(200, JSON.parse(cachedMe), "*Exam By Id.*"));
+  }
+
   const exam = await Exam.findById(exam_id)
     .populate("batch", "name course teacher")
     .populate("createdBy", "name userName email");
 
   if (!exam) {
     throw new ApiError(404, "Exam not found.");
+  }
+
+  try {
+    await redisClient.setEx(cachedKey, 60 * 20, JSON.stringify(exam));
+  } catch (err) {
+    console.log("Redis set failed");
   }
 
   return res.status(200).json(new ApiResponse(200, exam, "Exam details."));
