@@ -41,9 +41,9 @@ app.use(
 app.use(helmet());
 app.use(cookieParser());
 
-if (process.env.NODE_ENV !== "test") {
-  app.use(arcjetMiddleware);
-}
+// if (process.env.NODE_ENV !== "test") {
+//   app.use(arcjetMiddleware);
+// }
 
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/user", userRouter);

@@ -27,4 +27,5 @@ export const {
 
   // REDIS
   REDIS_URL,
+  MONGODB_TEST_URL,
 } = process.env;
