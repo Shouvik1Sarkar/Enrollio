@@ -1,8 +1,10 @@
 import request from "supertest";
-import { jest } from "@jest/globals";
+import { it, jest } from "@jest/globals";
 import { MONGODB_TEST_URL } from "../config/env.config.js";
 import { connectDB } from "../connection/db.connection.js";
 import mongoose from "mongoose";
+import crypto from "crypto";
+import User from "../src/models/user.models.js";
 
 const { default: app } = await import("../src/app.js");
 // import app from "../src/app.js";
@@ -11,6 +13,7 @@ beforeAll(async () => {
   //   await mongoose.connect(MONGODB_URL);
   // console.log("CONNECTING");
   await connectDB(MONGODB_TEST_URL);
+  await User.deleteMany();
   // console.log("-----CONNECTED------");
 }, 15000);
 
@@ -48,6 +51,50 @@ afterAll(async () => {
   console.log("Cleanup complete");
 }, 30000);
 
+async function register_SuperAdmin() {
+  await request(app).post("/api/v1/auth/first-user").send({
+    name: "test-super-admin",
+    userName: "test_super_admin",
+    email: "test-super-admin@example.com",
+    password: "aA@#12345",
+  });
+}
+
+async function verify() {
+  const otp = 123456;
+
+  const hashedOTP = crypto
+    .createHash("sha256")
+    .update(otp.toString())
+    .digest("hex");
+
+  await User.findOneAndUpdate(
+    {
+      email: "test-super-admin@example.com",
+    },
+    {
+      emailVerificationOtp: hashedOTP,
+      emailVerificationOtpExpiry: Date.now() + 5 * 60 * 1000,
+    },
+  );
+
+  await request(app).post("/api/v1/auth/verify").send({ otp: otp });
+}
+
+async function register_verify() {
+  await register_SuperAdmin();
+  await verify();
+}
+
+async function logIn() {
+  await register_verify();
+
+  await request(app).post("/api/v1/auth/log-in").send({
+    email: "test-super-admin@example.com",
+    password: "aA@#12345",
+  });
+}
+
 describe("Auth Api", () => {
   it("should register superadmin", async () => {
     const res = await request(app).post("/api/v1/auth/first-user").send({
@@ -56,11 +103,71 @@ describe("Auth Api", () => {
       email: "test-super-admin@example.com",
       password: "aA@#12345",
     });
-   
+
     expect(res.status).toBe(201);
     expect(res.body.data).toHaveProperty(
       "email",
       "test-super-admin@example.com",
     );
   });
+
+  it("Verify the Email.", async () => {
+    await register_SuperAdmin();
+
+    const otp = 123456;
+
+    const hashedOTP = crypto
+      .createHash("sha256")
+      .update(otp.toString())
+      .digest("hex");
+
+    await User.findOneAndUpdate(
+      {
+        email: "test-super-admin@example.com",
+      },
+      {
+        emailVerificationToken: hashedOTP,
+        emailVerificationTokenExpiry: Date.now() + 5 * 60 * 1000,
+      },
+    );
+
+    const res = await request(app)
+      .post("/api/v1/auth/verify")
+      .send({ otp: otp });
+  });
+
+  it("LogIn User", async () => {
+    await register_verify();
+
+    const res = await request(app).post("/api/v1/auth/log-in").send({
+      email: "test-super-admin@example.com",
+      password: "aA@#12345",
+    });
+
+    console.log("RES -> ", res.error);
+    expect(res.status).toBe(200);
+    expect(res.body.data).toHaveProperty(
+      "email",
+      "test-super-admin@example.com",
+    );
+  });
+
+  // it("Create a User", async () => {
+  //   const agent = request.agent(app);
+  //   await logIn(agent);
+
+  //   const res = await request(app).post("/api/v1/auth/create-user").send({
+  //     name: "student-1",
+  //     userName: "student1",
+  //     email: "student-1@example.com",
+  //     password: "aA@#12345",
+  //     role: "student",
+  //   });
+
+  //   // console.log("RES STATUS-> ", res.error);
+  //   console.log("RES STATUS-> ", res.error);
+
+  //   expect(res.status).toBe(200);
+  //   expect(res.body.data).toHaveProperty("email", "student-1@example.com");
+  // });
 }, 15000);
