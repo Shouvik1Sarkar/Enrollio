@@ -65,11 +65,13 @@ export const createFirstUser = asyncHandler(async (req, res) => {
 
   logger.info({ otp }, "OTP->");
 
-  await sendMail({
-    email: user.email,
-    subject: "Verify your account",
-    mailGenContent: emailVerificationMailContent(user.name, otp),
-  });
+  if (process.env.NODE_ENV !== "test") {
+    await sendMail({
+      email: user.email,
+      subject: "Verify your account",
+      mailGenContent: emailVerificationMailContent(user.name, otp),
+    });
+  }
 
   const createdUser = await User.findById(user._id).select(
     "-password -emailVerificationOtp -emailVerificationOtpExpiry",
@@ -232,11 +234,13 @@ export const createUser = asyncHandler(async (req, res) => {
 
   logger.info({ otp }, "OTP->");
 
-  await sendMail({
-    email: createdUser.email,
-    subject: "Verify your account",
-    mailGenContent: emailVerificationMailContent(createdUser.name, otp),
-  });
+  if (process.env.NODE_ENV !== "test") {
+    await sendMail({
+      email: createdUser.email,
+      subject: "Verify your account",
+      mailGenContent: emailVerificationMailContent(createdUser.name, otp),
+    });
+  }
 
   // 6. return safe user object
   const finalUser = await User.findById(createdUser._id).select(

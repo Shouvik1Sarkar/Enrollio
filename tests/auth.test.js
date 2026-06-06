@@ -87,12 +87,15 @@ async function register_verify() {
 }
 
 async function logIn() {
-  await register_verify();
+  await register_SuperAdmin();
+  await verify();
 
-  await request(app).post("/api/v1/auth/log-in").send({
+  const res = await request(app).post("/api/v1/auth/log-in").send({
     email: "test-super-admin@example.com",
     password: "aA@#12345",
   });
+
+  return res.headers["set-cookie"];
 }
 
 describe("Auth Api", () => {
@@ -152,22 +155,25 @@ describe("Auth Api", () => {
     );
   });
 
-  // it("Create a User", async () => {
-  //   const agent = request.agent(app);
-  //   await logIn(agent);
+  it("Create a User", async () => {
+    // const agent = request.agent(app);
+    const cookies = await logIn();
 
-  //   const res = await request(app).post("/api/v1/auth/create-user").send({
-  //     name: "student-1",
-  //     userName: "student1",
-  //     email: "student-1@example.com",
-  //     password: "aA@#12345",
-  //     role: "student",
-  //   });
+    const res = await request(app)
+      .post("/api/v1/auth/create-user")
+      .send({
+        name: "student-1",
+        userName: "student1",
+        email: "student-1@example.com",
+        password: "aA@#12345",
+        role: "student",
+      })
+      .set("Cookie", cookies);
 
-  //   // console.log("RES STATUS-> ", res.error);
-  //   console.log("RES STATUS-> ", res.error);
+    // console.log("RES STATUS-> ", res.error);
+    console.log("RES STATUS-> ", res.error);
 
-  //   expect(res.status).toBe(200);
-  //   expect(res.body.data).toHaveProperty("email", "student-1@example.com");
-  // });
+    expect(res.status).toBe(201);
+    expect(res.body.data).toHaveProperty("email", "student-1@example.com");
+  });
 }, 15000);
