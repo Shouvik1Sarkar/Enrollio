@@ -176,4 +176,18 @@ describe("Auth Api", () => {
     expect(res.status).toBe(201);
     expect(res.body.data).toHaveProperty("email", "student-1@example.com");
   });
+
+  it("Change Password.", async () => {
+    const cookies = await logIn();
+
+    const res = await request(app)
+      .post("/api/v1/auth/change-password")
+      .send({
+        password: "aA@#12345",
+        newPassword: "bB@#12345",
+        confirmNewPassword: "bB@#12345",
+      })
+      .set("Cookie", cookies);
+    expect(res.status).toBe(200);
+  });
 }, 15000);
