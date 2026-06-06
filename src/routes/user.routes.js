@@ -45,7 +45,7 @@ userRouter.get(
 );
 
 // *** GET USER BY USER NAME*** \\
-userRouter.get(
+userRouter.post(
   "/username",
   logInAuth,
   authorizeRoles(admin, super_admin, teacher),

@@ -86,10 +86,18 @@ async function register_verify() {
   await verify();
 }
 
-async function logIn() {
-  await register_SuperAdmin();
-  await verify();
+// async function logIn1() {
+//   await register_SuperAdmin();
+//   await verify();
 
+//   const res = await request(app).post("/api/v1/auth/log-in").send({
+//     email: "test-super-admin@example.com",
+//     password: "aA@#12345",
+//   });
+
+//   return res.headers["set-cookie"];
+// }
+async function logIn() {
   const res = await request(app).post("/api/v1/auth/log-in").send({
     email: "test-super-admin@example.com",
     password: "aA@#12345",
@@ -98,8 +106,9 @@ async function logIn() {
   return res.headers["set-cookie"];
 }
 
-describe("Auth Api", () => {
+describe("User API", () => {
   it("Get User profile.", async () => {
+    await register_verify();
     const cookies = await logIn();
     const res = await request(app)
       .get("/api/v1/user/me")
@@ -124,13 +133,40 @@ describe("Auth Api", () => {
     expect(res.status).toBe(200);
     expect(res.body.data).toHaveProperty("userName", "updated_user");
   });
-  it("Update User profile.", async () => {
+
+  it("All Users profile.", async () => {
     const cookies = await logIn();
     const res = await request(app)
       .get("/api/v1/user/all-users")
       .set("Cookie", cookies);
 
     console.log("ERROR: ", res.error);
+    expect(res.status).toBe(200);
+  });
+
+  it("User by user Name", async () => {
+    const cookies = await logIn();
+    const res = await request(app)
+      .post("/api/v1/user/username")
+      .send({
+        user_name: "updated_user",
+      })
+      .set("Cookie", cookies);
+
+    expect(res.status).toBe(200);
+  });
+
+  it("User by user id", async () => {
+    const cookies = await logIn();
+
+    const user = await User.findOne({ email: "test-super-admin@example.com" });
+    user_id = user._id.toString();
+
+    const res = await request(app)
+      .get(`/api/v1/user/${user_id}`)
+
+      .set("Cookie", cookies);
+
     expect(res.status).toBe(200);
   });
 }, 15000);

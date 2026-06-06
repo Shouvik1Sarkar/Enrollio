@@ -365,8 +365,6 @@ export const getUserById = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, response_data, "User found."));
 });
 
-// Might change to only SUPER_ADMIN CAN DO THIS.
-
 // *** GET USER BY USER NAME *** \\
 
 export const getUserByUserName = asyncHandler(async (req, res) => {
