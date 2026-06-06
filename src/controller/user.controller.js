@@ -112,6 +112,7 @@ export const updateUser = asyncHandler(async (req, res) => {
     throw new ApiError(404, "User not found.");
   }
 
+  // if (process.env.NODE_ENV !== "test") {
   try {
     await redisClient.del(`Me:${userId}`);
     await redisClient.del(`users:all`);
@@ -120,6 +121,7 @@ export const updateUser = asyncHandler(async (req, res) => {
   } catch (error) {
     console.error("Redis del failed:", error);
   }
+  // }
   return res
     .status(200)
     .json(new ApiResponse(200, updatedUser, "User updated successfully."));
@@ -210,10 +212,12 @@ export const allUsers = asyncHandler(async (req, res) => {
   const cachedKey = `users:all`;
   let cachedMe;
 
-  try {
-    cachedMe = await redisClient.get(cachedKey);
-  } catch (err) {
-    console.log("Redis error, fallback to DB");
+  if (process.env.NODE_ENV !== "test") {
+    try {
+      cachedMe = await redisClient.get(cachedKey);
+    } catch (err) {
+      console.log("Redis error, fallback to DB");
+    }
   }
 
   if (cachedMe) {
