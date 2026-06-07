@@ -117,7 +117,8 @@ async function create_student() {
 
   return res.body.data;
 }
-
+let a;
+let student;
 describe("STUDENT API", () => {
   it("Set Student Profile.", async () => {
     await register_verify();
@@ -127,7 +128,7 @@ describe("STUDENT API", () => {
     // console.log("USER -> ", user);
     // user_id = user._id.toString();
 
-    const a = await create_student();
+    a = await create_student();
 
     const user_id = a._id;
 
@@ -144,7 +145,35 @@ describe("STUDENT API", () => {
       })
       .set("Cookie", cookies);
 
+    student = res.body.data._id;
     console.log("USER -> ", res.error);
     expect(res.status).toBe(201);
+  });
+
+  it("Get All Students", async () => {
+    // await register_verify();
+    const cookies = await logIn();
+
+    const res = await request(app)
+      .get(`/api/v1/student/all`)
+      .set("Cookie", cookies);
+
+    console.log("ERROR -> ", res.error);
+    expect(res.status).toBe(200);
+  });
+
+  it("Get student by id", async () => {
+    // await register_verify();
+    const cookies = await logIn();
+
+    const student_id = student;
+
+    console.log("STUDENT -> ", student_id);
+    const res = await request(app)
+      .get(`/api/v1/student/${student_id}`)
+      .set("Cookie", cookies);
+
+    console.log("ERROR -> ", res.error);
+    expect(res.status).toBe(200);
   });
 }, 15000);
