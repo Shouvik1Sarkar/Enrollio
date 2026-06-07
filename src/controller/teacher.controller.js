@@ -36,7 +36,7 @@ export const setupTeacherProfile = asyncHandler(async (req, res) => {
   const teacher = await Teacher.create({
     userId,
     education,
-    experience,
+    experience: experience || undefined,
     subjects,
     createdBy: req.user._id,
     salary: salary || undefined,

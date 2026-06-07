@@ -11,7 +11,8 @@
     "dev": "nodemon index.js",
     "test": "cross-env NODE_ENV=test node --experimental-vm-modules node_modules/jest/bin/jest.js tests/auth.test.js",
     "test:user": "cross-env NODE_ENV=test node --experimental-vm-modules node_modules/jest/bin/jest.js tests/user.test.js",
-    "test:student": "cross-env NODE_ENV=test node --experimental-vm-modules node_modules/jest/bin/jest.js tests/student.test.js"
+    "test:student": "cross-env NODE_ENV=test node --experimental-vm-modules node_modules/jest/bin/jest.js tests/student.test.js",
+    "test:teacher": "cross-env NODE_ENV=test node --experimental-vm-modules node_modules/jest/bin/jest.js tests/teacher.test.js"
   },
   "keywords": [],
   "author": "",
