@@ -24,7 +24,7 @@ const student = available_user_roles.STUDENT;
 teacherRouter.post("/setup/:userId", logInAuth, setupTeacherProfile);
 
 // *** UPDATE TEACHER *** \\
-teacherRouter.post(
+teacherRouter.patch(
   "/update/:userId",
   logInAuth,
   authorizeRoles(admin, super_admin),

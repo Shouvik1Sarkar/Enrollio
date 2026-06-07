@@ -120,7 +120,7 @@ async function create_teacher() {
 let a;
 let teacher;
 describe("STUDENT API", () => {
-  it("Set Student Profile.", async () => {
+  it("Set Teacher Profile.", async () => {
     await register_verify();
     const cookies = await logIn();
 
@@ -144,5 +144,28 @@ describe("STUDENT API", () => {
     student = res.body.data._id;
     console.log("USER -> ", res.error);
     expect(res.status).toBe(201);
+  });
+  it("Update Teacher Profile.", async () => {
+    // await register_verify();
+    const cookies = await logIn();
+
+    // const user = await User.findOne({ email: "student-1@example.com" });
+    // console.log("USER -> ", user);
+    // user_id = user._id.toString();
+
+    // a = await create_teacher();
+
+    const user_id = a._id;
+
+    const res = await request(app)
+      .patch(`/api/v1/teacher/update/${user_id}`)
+      .send({
+        salary: 15000,
+      })
+      .set("Cookie", cookies);
+
+    student = res.body.data._id;
+    console.log("USER -> ", res.error);
+    expect(res.status).toBe(200);
   });
 }, 15000);
