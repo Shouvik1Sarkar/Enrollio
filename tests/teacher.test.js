@@ -171,7 +171,7 @@ describe("STUDENT API", () => {
     expect(res.status).toBe(200);
   });
 
-  it("Update Teacher Profile.", async () => {
+  it("Update Teacher Salary.", async () => {
     // await register_verify();
     const cookies = await logIn();
 
@@ -194,7 +194,7 @@ describe("STUDENT API", () => {
     expect(res.status).toBe(200);
   });
 
-  it("Update Teacher Profile.", async () => {
+  it("GET Teacher by id.", async () => {
     // await register_verify();
     const cookies = await logIn();
 
