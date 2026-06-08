@@ -180,4 +180,17 @@ describe("Course API", () => {
     console.log("USER -> ", res.error);
     expect(res.status).toBe(200);
   });
+  it("Delete Course.", async () => {
+    await register_verify();
+    const cookies = await logIn();
+
+    const res = await request(app)
+      .delete(`/api/v1/course/delete/${course_id}`)
+
+      .set("Cookie", cookies);
+
+    // console.log("xxxxxxxxxx-> ", res.body.data.message);
+    console.log("USER -> ", res.error);
+    expect(res.status).toBe(200);
+  });
 }, 15000);
