@@ -119,6 +119,7 @@ async function create_student() {
 }
 let a;
 let student;
+let course_id;
 describe("Course API", () => {
   it("Set Course.", async () => {
     await register_verify();
@@ -132,10 +133,51 @@ describe("Course API", () => {
         standard: "10",
         board: "WB",
         description: "10th standard.",
+        description: "This ",
       })
+      .set("Cookie", cookies);
+    course_id = res.body.data._id;
+    console.log("USER -> ", res.error);
+    expect(res.status).toBe(201);
+  });
+
+  it("All Courses.", async () => {
+    await register_verify();
+    const cookies = await logIn();
+
+    const res = await request(app)
+      .get(`/api/v1/course/all`)
       .set("Cookie", cookies);
 
     console.log("USER -> ", res.error);
-    expect(res.status).toBe(201);
+    expect(res.status).toBe(200);
+  });
+
+  it("Courses By Id.", async () => {
+    await register_verify();
+    const cookies = await logIn();
+
+    const res = await request(app)
+      .get(`/api/v1/course/${course_id}`)
+      .set("Cookie", cookies);
+
+    console.log("USER -> ", res.error);
+    expect(res.status).toBe(200);
+  });
+
+  it("Update Courses.", async () => {
+    await register_verify();
+    const cookies = await logIn();
+
+    const res = await request(app)
+      .patch(`/api/v1/course/${course_id}`)
+      .send({
+        board: "ICSE",
+      })
+      .set("Cookie", cookies);
+
+    // console.log("xxxxxxxxxx-> ", res.body.data.message);
+    console.log("USER -> ", res.error);
+    expect(res.status).toBe(200);
   });
 }, 15000);

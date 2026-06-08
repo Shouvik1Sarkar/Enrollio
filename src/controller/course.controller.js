@@ -61,7 +61,7 @@ export const createCourse = asyncHandler(async (req, res) => {
     standard,
     stream,
     board,
-    description: description ?? null,
+    description: description ?? undefined,
     createdBy: myUser._id,
   });
 
