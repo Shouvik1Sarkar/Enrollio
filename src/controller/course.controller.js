@@ -55,7 +55,7 @@ export const createCourse = asyncHandler(async (req, res) => {
   }
 
   const newCourse = await Course.create({
-    name, // null for school — pre-save hook generates it
+    name, // null for school  pre-save hook generates it
     courseType,
     subject,
     standard,
