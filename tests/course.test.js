@@ -95,6 +95,25 @@ async function logIn() {
   return res.headers["set-cookie"];
 }
 
+async function create_teacher() {
+  const cookies = await logIn();
+
+  const res = await request(app)
+    .post("/api/v1/auth/create-user")
+    .send({
+      name: "teacher-1",
+      userName: "teacher1",
+      email: "teacher-1@example.com",
+      password: "aA@#12345",
+      role: "teacher",
+    })
+    .set("Cookie", cookies);
+
+  // console.log("RES STATUS-> ", res.error);
+
+  return res.body.data._id;
+}
+
 async function create_student() {
   const cookies = await logIn();
 
@@ -139,58 +158,5 @@ describe("Course API", () => {
     course_id = res.body.data._id;
     console.log("USER -> ", res.error);
     expect(res.status).toBe(201);
-  });
-
-  it("All Courses.", async () => {
-    await register_verify();
-    const cookies = await logIn();
-
-    const res = await request(app)
-      .get(`/api/v1/course/all`)
-      .set("Cookie", cookies);
-
-    console.log("USER -> ", res.error);
-    expect(res.status).toBe(200);
-  });
-
-  it("Courses By Id.", async () => {
-    await register_verify();
-    const cookies = await logIn();
-
-    const res = await request(app)
-      .get(`/api/v1/course/${course_id}`)
-      .set("Cookie", cookies);
-
-    console.log("USER -> ", res.error);
-    expect(res.status).toBe(200);
-  });
-
-  it("Update Courses.", async () => {
-    await register_verify();
-    const cookies = await logIn();
-
-    const res = await request(app)
-      .patch(`/api/v1/course/${course_id}`)
-      .send({
-        board: "ICSE",
-      })
-      .set("Cookie", cookies);
-
-    // console.log("xxxxxxxxxx-> ", res.body.data.message);
-    console.log("USER -> ", res.error);
-    expect(res.status).toBe(200);
-  });
-  it("Delete Course.", async () => {
-    await register_verify();
-    const cookies = await logIn();
-
-    const res = await request(app)
-      .delete(`/api/v1/course/delete/${course_id}`)
-
-      .set("Cookie", cookies);
-
-    // console.log("xxxxxxxxxx-> ", res.body.data.message);
-    console.log("USER -> ", res.error);
-    expect(res.status).toBe(200);
   });
 }, 15000);

@@ -117,39 +117,68 @@ async function create_student() {
 
   return res.body.data;
 }
+
+async function create_course() {
+  const cookies = await logIn();
+
+  const res = await request(app)
+    .post(`/api/v1/course/create-course`)
+    .send({
+      courseType: "school",
+      subject: "math",
+      standard: "10",
+      board: "WB",
+      description: "10th standard.",
+    })
+    .set("Cookie", cookies);
+
+  return res.body.data;
+}
+
 let a;
 let student;
+let batch_id;
 describe("Batch API", () => {
   it("Set Batch.", async () => {
     await register_verify();
     const cookies = await logIn();
 
-    // const user = await User.findOne({ email: "student-1@example.com" });
-    // console.log("USER -> ", user);
-    // user_id = user._id.toString();
+    const course = await create_course();
 
-    a = await create_student();
-
-    const user_id = a._id;
-
-    console.log("A --> ", a);
-    console.log("A --> ", user_id);
+    const name = course.name;
+    const course_id = course._id;
 
     const res = await request(app)
       .post(`/api/v1/batch/create`)
       .send({
-        courseName,
-        teacher,
-        students,
-        learningMode,
-        schedule,
-        monthlyFees,
-        serial,
+        courseName: name,
+        // teacher,
+        // students,
+        learningMode: "BATCH",
+        schedule: ["MONDAY", "TUESDAY"],
+        monthlyFees: 1000,
+        serial: "A",
       })
       .set("Cookie", cookies);
-
-    student = res.body.data._id;
+    batch_id = res.body.data._id;
     console.log("USER -> ", res.error);
     expect(res.status).toBe(201);
+  });
+
+  it("All Students Batches.", async () => {
+    await register_verify();
+    const cookies = await logIn();
+
+    // const course = await create_course();
+
+    // const name = course.name;
+    // const course_id = course._id;
+
+    const res = await request(app)
+      .get(`/api/v1/batch/all/${batch_id}`)
+      .set("Cookie", cookies);
+
+    console.log("USER -> ", res.error);
+    expect(res.status).toBe(200);
   });
 }, 15000);
