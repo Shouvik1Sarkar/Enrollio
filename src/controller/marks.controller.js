@@ -89,9 +89,7 @@ export const createMarks = asyncHandler(async (req, res) => {
   if (!marks) {
     throw new ApiError(500, "Marks not created.");
   }
-  return res
-    .status(201)
-    .json(new ApiResponse(201, marks, "Marks created."));
+  return res.status(201).json(new ApiResponse(201, marks, "Marks created."));
 
   /**
    * if it's not super admin is the teacher the teacher of the batch (the exam of the batch)
@@ -266,6 +264,14 @@ export const getMyMarks = asyncHandler(async (req, res) => {
     throw new ApiError(403, "Only students can access their marks.");
   }
 
+  const student = await Student.findOne({
+    userId: user._id,
+  });
+
+  if (!student) {
+    throw new ApiError(404, "Student not found.");
+  }
+
   const userId = req.user._id;
   const cachedKey = `Marks:me:${userId}`;
   let cachedMe;
@@ -283,7 +289,7 @@ export const getMyMarks = asyncHandler(async (req, res) => {
   }
 
   const marks = await Marks.find({
-    student: user._id,
+    student: student._id,
   });
 
   // if (!marks) {

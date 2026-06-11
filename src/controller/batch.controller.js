@@ -235,6 +235,7 @@ export const updateBatch = asyncHandler(async (req, res) => {
 
   try {
     await redisClient.del(`all:students:${batch_id}`);
+    await redisClient.del(`batch:id:${batch_id}`);
   } catch (error) {
     throw new ApiError(401, "REDIS ERROR.");
   }
@@ -324,6 +325,7 @@ export const removeStudent = asyncHandler(async (req, res) => {
 
   try {
     await redisClient.del(`all:students:${batch._id}`);
+    await redisClient.del(`batch:id:${batch_id}`);
   } catch (error) {
     throw new ApiError(401, "REDIS ERROR.");
   }
