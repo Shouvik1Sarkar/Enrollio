@@ -31,6 +31,7 @@ teacherRouter.patch(
   authorizeRoles(admin, super_admin),
   updateTeacher,
 );
+
 // *** UPDATE SALARY *** \\
 teacherRouter.patch(
   "/update/salary/:teacher_id",
@@ -84,6 +85,7 @@ teacherRouter.patch(
 );
 
 export default teacherRouter;
+
 // teacherRouter.get(
 //   "/my-students",
 //   logInAuth,
