@@ -29,7 +29,7 @@ const marksSchema = new mongoose.Schema(
     testName: {
       type: String, // "Class Test 1", "Monthly Test", "Final Exam"
       required: true,
-      trim: true,
+      // trim: true,
     },
 
     // testType: {
