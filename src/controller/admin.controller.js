@@ -134,3 +134,4 @@ export const getAdminById = asyncHandler(async (req, res) => {
     .status(200)
     .json(new ApiResponse(200, admin, "Admin found by id."));
 });
+

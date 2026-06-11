@@ -238,7 +238,7 @@ export const salary_history = asyncHandler(async (req, res) => {
     if (!teacher) {
       throw new ApiError(404, "Teacher not found.");
     }
-  } else {
+  } else if (get_user.role === "admin") {
     const admin = await Admin.findOne({ userId: user_id });
 
     if (!admin) {
@@ -399,9 +399,9 @@ export const my_salary = asyncHandler(async (req, res) => {
 // ||||||||||||||||||||||||||||||||||||
 // ||||||||||||||||||||||||||||||||||||
 // ||||||| \\  |||‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
-// |||||||  \\ |||
+// |||||||  \\_|||
 // |||||||||||||||
 // |||||||‾‾‾‾‾‾‾‾
 // |||||||
 // |||||||
-// ‾‾‾‾‾‾
+// ‾‾‾‾‾‾‾
