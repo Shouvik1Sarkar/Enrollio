@@ -117,7 +117,69 @@ export const paid_salary = asyncHandler(async (req, res) => {
 
   const now = new Date();
 
-  const salary = await Salary.findOne({ user: user_id });
+  const salary = await Salary.find({ user: user_id });
+
+  if (!salary) {
+    throw new ApiError(404, "Salary not found");
+  }
+
+  salary.map((s) => {
+    if (s.status === "paid") {
+      throw new ApiError(409, "Salary already paid");
+    }
+    s.status = "paid";
+    s.paidAt = now;
+    s.paidBy = user._id;
+    s.note = note || undefined;
+  });
+
+  await salary.save({
+    validateBeforeSave: false,
+  });
+
+  //   teacher.salaryRecord.push(salary);
+  //   await teacher.save({ validateBeforeSave: false });
+
+  return res.status(201).json(new ApiResponse(201, salary, "salary paid."));
+});
+// *** PAID SALARY *** \\
+
+export const paid_salary_id = asyncHandler(async (req, res) => {
+  const user = req.user;
+  if (!user) {
+    throw new ApiError(401, "User not logged in.");
+  }
+
+  const { user_id } = req.params;
+  const { note } = req.body || {};
+  const { salary_id } = req.params;
+  const get_user = await User.findById(user_id);
+
+  if (!get_user) {
+    throw new ApiError(404, "User not found.");
+  }
+
+  let teacher;
+  let admin;
+  if (get_user.role === "teacher") {
+    teacher = await Teacher.findOne({
+      userId: get_user._id,
+    });
+    if (!teacher) {
+      throw new ApiError(404, "Teacher not found");
+    }
+  } else if (get_user.role === "admin") {
+    admin = await Admin.findOne({
+      userId: get_user._id,
+    });
+    if (!admin) {
+      throw new ApiError(404, "Admin not found");
+    }
+  }
+
+  const now = new Date();
+
+  const salary = await Salary.findById(salary_id);
 
   if (!salary) {
     throw new ApiError(404, "Salary not found");
