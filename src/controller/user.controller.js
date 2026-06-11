@@ -90,6 +90,11 @@ export const updateUser = asyncHandler(async (req, res) => {
   if (myUser.role === available_user_roles.STUDENT) {
     throw new ApiError(403, "Students cannot update accounts.");
   }
+  const oldUser = await User.findById(userId);
+
+  if (!oldUser) {
+    throw new ApiError(404, "User not found.");
+  }
 
   const { email, userName, name } = req.body;
 
@@ -116,8 +121,8 @@ export const updateUser = asyncHandler(async (req, res) => {
   try {
     await redisClient.del(`Me:${userId}`);
     await redisClient.del(`users:all`);
-    await redisClient.del(`user_by_id:${user_id}`);
-    await redisClient.del(`user_by_name:${change_user.userName}`);
+    await redisClient.del(`user_by_id:${userId}`);
+    await redisClient.del(`user_by_name:${oldUser.userName}`);
   } catch (error) {
     console.error("Redis del failed:", error);
   }
@@ -153,7 +158,7 @@ export const deleteUser = asyncHandler(async (req, res) => {
     throw new ApiError(409, "You cannot delete your own account.");
   }
 
-  // ── STUDENT cleanup ───────────────────────────
+  // ***** STUDENT cleanup **************************** \\
   if (user.role === available_user_roles.STUDENT) {
     const student = await Student.findOne({ userId: user_id });
     if (student) {
@@ -166,7 +171,7 @@ export const deleteUser = asyncHandler(async (req, res) => {
     }
   }
 
-  // ── TEACHER cleanup ───────────────────────────
+  // ***** TEACHER cleanup **************************** \\
   if (user.role === available_user_roles.TEACHER) {
     const teacher = await Teacher.findOne({ userId: user_id });
     if (teacher) {
@@ -179,7 +184,8 @@ export const deleteUser = asyncHandler(async (req, res) => {
     }
   }
 
-  // ── ADMIN cleanup ─────────────────────────────
+  // ***** ADMIN cleanup **************************** \\
+
   if (user.role === available_user_roles.ADMIN) {
     await Admin.findOneAndDelete({ userId: user_id });
   }
@@ -190,7 +196,7 @@ export const deleteUser = asyncHandler(async (req, res) => {
     await redisClient.del(`users:all`);
     await redisClient.del(`Me:${user_id}`);
     await redisClient.del(`user_by_id:${user_id}`);
-    await redisClient.del(`user_by_name:${change_user.userName}`);
+    await redisClient.del(`user_by_name:${user.userName}`);
   } catch (error) {
     logger.error(error, "Redis del failed on updateUserRole");
   }
@@ -279,7 +285,7 @@ export const updateUserRole = asyncHandler(async (req, res) => {
   }
   const { role } = req.body;
 
-  if (!role || !validRoles.includes(role)) {
+  if (!role || !user_roles_enum.includes(role)) {
     throw new ApiError(400, "Invalid role.");
   }
 

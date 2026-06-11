@@ -162,8 +162,10 @@ export const updateCourse = asyncHandler(async (req, res) => {
   const { courseType, subject, standard, stream, board, description, name } =
     req.body;
 
-  if (!boards_enum.includes(board.toUpperCase())) {
-    throw new ApiError(400, "BOARD DOES NOT EXIST");
+  if (board) {
+    if (!boards_enum.includes(board.toUpperCase())) {
+      throw new ApiError(400, "BOARD DOES NOT EXIST");
+    }
   }
 
   const existingCourse = await Course.findOne({

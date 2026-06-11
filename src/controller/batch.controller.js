@@ -123,6 +123,22 @@ export const getBatchById = asyncHandler(async (req, res) => {
 
   const { batch_id } = req.params;
 
+  const userId = req.user._id;
+  const cachedKey = `batch:id:${batch_id}`;
+  let cachedMe;
+
+  try {
+    cachedMe = await redisClient.get(cachedKey);
+  } catch (err) {
+    console.log("Redis error, fallback to DB");
+  }
+
+  if (cachedMe) {
+    return res
+      .status(200)
+      .json(new ApiResponse(200, JSON.parse(cachedMe), "*ALL STUDENTS.*"));
+  }
+
   const batch = await Batch.findById(batch_id)
     .populate({
       path: "teacher",
@@ -147,6 +163,12 @@ export const getBatchById = asyncHandler(async (req, res) => {
 
   if (!batch) {
     throw new ApiError(404, "Batch not found.");
+  }
+
+  try {
+    await redisClient.setEx(cachedKey, 60 * 20, JSON.stringify(batch));
+  } catch (err) {
+    console.log("Redis set failed");
   }
 
   return res.status(200).json(new ApiResponse(200, batch, "Batch found."));
@@ -209,6 +231,12 @@ export const updateBatch = asyncHandler(async (req, res) => {
 
   if (!updatedBatch) {
     throw new ApiError(404, "Batch not found");
+  }
+
+  try {
+    await redisClient.del(`all:students:${batch_id}`);
+  } catch (error) {
+    throw new ApiError(401, "REDIS ERROR.");
   }
 
   return res
@@ -293,6 +321,12 @@ export const removeStudent = asyncHandler(async (req, res) => {
   );
 
   await updatedStudent.save({ validateBeforeSave: false });
+
+  try {
+    await redisClient.del(`all:students:${batch._id}`);
+  } catch (error) {
+    throw new ApiError(401, "REDIS ERROR.");
+  }
 
   return res
     .status(200)

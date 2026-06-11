@@ -91,7 +91,7 @@ export const createMarks = asyncHandler(async (req, res) => {
   }
   return res
     .status(201)
-    .json(new ApiResponse(201, marks, "Marks not created."));
+    .json(new ApiResponse(201, marks, "Marks created."));
 
   /**
    * if it's not super admin is the teacher the teacher of the batch (the exam of the batch)
@@ -133,7 +133,7 @@ export const updateMarks = asyncHandler(async (req, res) => {
   if (remarks) marks.remarks = remarks;
   if (month) marks.month = month;
 
-  await redisClient.del(`Marks:me:${userId}`);
+  await redisClient.del(`Marks:me:${student_id}`);
 
   await marks.save();
   return res.status(200).json(new ApiResponse(200, marks, "Marks Updated."));

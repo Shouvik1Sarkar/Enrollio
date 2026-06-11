@@ -167,7 +167,7 @@ export const enrollStudentInBatch = asyncHandler(async (req, res) => {
   await student.save({ validateBeforeSave: false });
 
   try {
-    await redisClient.del(`all:students`);
+    await redisClient.del(`all:students:${batch._id}`);
   } catch (error) {
     logger.error(error);
   }

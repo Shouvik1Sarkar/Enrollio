@@ -418,7 +418,7 @@ export const changePassword = asyncHandler(async (req, res) => {
   if (!findUser) {
     throw new ApiError(401, "Authentication required.");
   }
-  const isPassword = findUser.matchPassword(password);
+  const isPassword = await findUser.matchPassword(password);
 
   if (!isPassword) {
     throw new ApiError(401, "Password not matched");
