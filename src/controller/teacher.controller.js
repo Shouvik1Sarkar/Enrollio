@@ -323,3 +323,24 @@ export const removeTeacherFromBatch = asyncHandler(async (req, res) => {
       new ApiResponse(200, null, "Teacher removed from batch successfully."),
     );
 });
+
+export const getAllTeachers = asyncHandler(async (req, res) => {
+  const user = req.user;
+
+  if (!user) {
+    throw new ApiError(404, "User not logged In.");
+  }
+
+  if (!["super_admin", "admin"].includes(user.role)) {
+    throw new ApiError(
+      401,
+      "Only Super Admin or Admin can access All the teachers.",
+    );
+  }
+
+  const teachers = await Teacher.find();
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, teachers, "ALL THE TEACHERS."));
+});

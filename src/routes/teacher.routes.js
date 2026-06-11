@@ -4,6 +4,7 @@ import { logInAuth } from "../middleware/logInAuth.middleware.js";
 import {
   assignTeacherToBatch,
   deleteTeacher,
+  getAllTeachers,
   getMyBatches,
   getTeacherById,
   setupTeacherProfile,
@@ -37,6 +38,15 @@ teacherRouter.patch(
   authorizeRoles(admin, super_admin),
   updateSalary,
 );
+
+// *** ALL TEACHERS *** \\
+teacherRouter.get(
+  "/all",
+  logInAuth,
+  authorizeRoles(admin, super_admin),
+  getAllTeachers,
+);
+
 // *** DELETE TEACHER *** \\
 teacherRouter.delete(
   "/delete/:teacher_id",
@@ -56,14 +66,6 @@ teacherRouter.get(
 
   getMyBatches,
 );
-// teacherRouter.get(
-//   "/my-students",
-//   logInAuth,
-//   authorizeRoles(available_user_roles.TEACHER),
-//   getMyStudents,
-// );
-
-// // admin-only teacher management
 
 // *** GET TEACHER BY ID *** \\
 teacherRouter.get(
@@ -82,3 +84,11 @@ teacherRouter.patch(
 );
 
 export default teacherRouter;
+// teacherRouter.get(
+//   "/my-students",
+//   logInAuth,
+//   authorizeRoles(available_user_roles.TEACHER),
+//   getMyStudents,
+// );
+
+// // admin-only teacher management
