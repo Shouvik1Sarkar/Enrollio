@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import authorizeRoles from "../middleware/authorizeRoles.middleware";
+import authorizeRoles from "../middleware/authorizeRoles.middleware.js";
 
 const adminSchema = new mongoose.Schema(
   {
@@ -30,9 +30,5 @@ const adminSchema = new mongoose.Schema(
   { timestamps: true },
 );
 
-const Admin = mongoose.model(
-  "Admin",
-  authorizeRoles(super_admin, admin),
-  adminSchema,
-);
+const Admin = mongoose.model("Admin", adminSchema);
 export default Admin;

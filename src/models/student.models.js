@@ -89,6 +89,40 @@ const feeRecordSchema = new mongoose.Schema(
   { _id: true },
 );
 
+const remarksSchema = new mongoose.Schema(
+  {
+    remarksBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Teacher", // teacher who remarked.
+      required: true,
+    },
+
+    remarksFor: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Student", // the student
+      required: true,
+    },
+
+    batch: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Batch", // which subject/batch this remark is about
+      required: true,
+    },
+
+    month: {
+      type: String, // "2025-03" — same pattern as salary
+      required: true,
+    },
+
+    remark: {
+      type: String, // the actual remark text
+      required: true,
+      trim: true,
+    },
+  },
+  { _id: true },
+);
+
 const studentSchema = new mongoose.Schema(
   {
     userId: {
@@ -146,6 +180,7 @@ const studentSchema = new mongoose.Schema(
     },
 
     feeHistory: [feeRecordSchema],
+    remarkHistory: [remarksSchema],
   },
   { timestamps: true },
 );

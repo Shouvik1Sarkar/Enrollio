@@ -14,6 +14,7 @@ import marksRouter from "./routes/marks.routes.js";
 import guestRouter from "./routes/guest.routes.js";
 import helmet from "helmet";
 import arcjetMiddleware from "./middleware/arcjet.middleware.js";
+import remarksRouter from "./routes/remark.routes.js";
 // import attendanceRouter from "./routes/attendance.routes.js";
 
 const app = express();
@@ -56,6 +57,7 @@ app.use("/api/v1/salary", salaryRouter);
 app.use("/api/v1/exam", examRouter);
 app.use("/api/v1/marks", marksRouter);
 app.use("/api/v1/consultation", guestRouter);
+app.use("/api/v1/remark", remarksRouter);
 // app.use("/api/v1/attendence", attendanceRouter);
 
 export default app;
