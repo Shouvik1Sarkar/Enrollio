@@ -14,8 +14,7 @@ export const createRemarks = asyncHandler(async (req, res) => {
 
   const month = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
 
-  const { studentId } = req.params;
-  const { batchId } = req.params;
+  const { studentId, batchId } = req.params;
 
   const { remark } = req.body;
 
@@ -25,18 +24,22 @@ export const createRemarks = asyncHandler(async (req, res) => {
     throw new ApiError(404, "Student not found.");
   }
 
+  const batch = await Batch.findById(batchId);
+
+  if (!batch) {
+    throw new ApiError(404, "Batch not found.");
+  }
+
+  if (batch.teacher !== user._id) {
+    throw new ApiError(400, "Only teacher of this batch can give review.");
+  }
+
   // correct array .find() with callback
   const existed_remark = student.remarkHistory.find(
     (r) => r.batch.toString() === batchId && r.month === month,
   );
   if (existed_remark) {
     throw new ApiError(409, "Remark already exists for this batch and month.");
-  }
-
-  const batch = await Batch.findById(batchId);
-
-  if (!batch) {
-    throw new ApiError(404, "Batch not found.");
   }
 
   student.remarkHistory.push({
@@ -61,14 +64,8 @@ export const updateRemarks = asyncHandler(async (req, res) => {
     throw new ApiError(401, "User not Logged In.");
   }
 
-  if (
-    ![
-      available_user_roles.TEACHER,
-      available_user_roles.ADMIN,
-      available_user_roles.SUPER_ADMIN,
-    ].includes(user.role)
-  ) {
-    throw new ApiError(403, "Only teachers or admins can update remarks.");
+  if (user.role !== available_user_roles.TEACHER) {
+    throw new ApiError(403, "Only teachers can update remarks.");
   }
 
   const { studentId, remarkId } = req.params;
@@ -90,9 +87,8 @@ export const updateRemarks = asyncHandler(async (req, res) => {
     throw new ApiError(404, "Remark not found.");
   }
 
-  // optional: only the teacher who wrote it (or super_admin) can edit
   if (
-    // user.role === available_user_roles.TEACHER &&
+    user.role === available_user_roles.TEACHER &&
     existingRemark.remarksBy.toString() !== user._id.toString()
   ) {
     throw new ApiError(403, "You can only edit your own remarks.");

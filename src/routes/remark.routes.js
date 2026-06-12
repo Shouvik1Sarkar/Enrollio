@@ -4,7 +4,11 @@ import { logInAuth } from "../middleware/logInAuth.middleware.js";
 
 import authorizeRoles from "../middleware/authorizeRoles.middleware.js";
 import { available_user_roles } from "../utils/constants.utils.js";
-import { createRemarks, remarkById } from "../controller/remark.controller.js";
+import {
+  createRemarks,
+  remarkById,
+  updateRemarks,
+} from "../controller/remark.controller.js";
 
 const remarksRouter = Router();
 
@@ -21,11 +25,11 @@ remarksRouter.post(
   createRemarks,
 );
 
-remarksRouter.delete(
+remarksRouter.patch(
   "/create/:studentId/:remarkId",
   logInAuth,
-  authorizeRoles(admin, super_admin, teacher),
-  createRemarks,
+  authorizeRoles(teacher),
+  updateRemarks,
 );
 
 remarksRouter.get(
