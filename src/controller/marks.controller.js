@@ -119,8 +119,7 @@ export const updateMarks = asyncHandler(async (req, res) => {
   if (!marks) {
     throw new ApiError(404, "Marks not found.");
   }
-  // console.log("STUDENT: ", marks.student);
-  // console.log("student_id: ", student_id);
+
   if (marks.student != student_id) {
     throw new ApiError(409, "Student does not match the marks record.");
   }

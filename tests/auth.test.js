@@ -10,11 +10,8 @@ const { default: app } = await import("../src/app.js");
 // import app from "../src/app.js";
 
 beforeAll(async () => {
-  //   await mongoose.connect(MONGODB_URL);
-  // console.log("CONNECTING");
   await connectDB(MONGODB_TEST_URL);
   await User.deleteMany();
-  // console.log("-----CONNECTED------");
 }, 15000);
 
 afterAll(async () => {

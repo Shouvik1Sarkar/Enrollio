@@ -305,7 +305,6 @@ export const getStudentBalance = asyncHandler(async (req, res) => {
   const now = new Date();
 
   student.feeHistory.forEach((record) => {
-    // console.log("record:", record);
     if (record.status === "paid") {
       totalPaid += record.amount;
     } else {

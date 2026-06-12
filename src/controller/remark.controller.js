@@ -39,9 +39,6 @@ export const createRemarks = asyncHandler(async (req, res) => {
     throw new ApiError(404, "Batch not found.");
   }
 
-  console.log("BATCH TEACHER ", batch.teacher);
-  console.log("BATCH TEACHER ", teacher._id);
-
   if (batch.teacher.toString() !== teacher._id.toString()) {
     throw new ApiError(400, "Only teacher of this batch can give review.");
   }
@@ -104,14 +101,10 @@ export const updateRemarks = asyncHandler(async (req, res) => {
 
   const existingRemark = student.remarkHistory.id(remarkId);
 
-  console.log("existed -> ", existingRemark);
-
   if (!existingRemark) {
     throw new ApiError(404, "Remark not found.");
   }
 
-  console.log("----------------", existingRemark.remarksBy.toString());
-  console.log("----------------", teacher._id.toString());
   if (
     user.role === available_user_roles.TEACHER &&
     existingRemark.remarksBy.toString() !== teacher._id.toString()

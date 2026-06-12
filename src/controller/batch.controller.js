@@ -92,8 +92,6 @@ export const getAllBatches = asyncHandler(async (req, res) => {
     throw new ApiError(401, "Authentication required.");
   }
   if (myUser.role !== available_user_roles.SUPER_ADMIN) {
-    // console.log("MY USER->", myUser);
-
     throw new ApiError(403, "Insufficient permissions.");
   }
 
@@ -249,10 +247,7 @@ export const updateBatch = asyncHandler(async (req, res) => {
 
 export const deleteBatch = asyncHandler(async (req, res) => {
   const myUser = req.user;
-
-  // console.log("USER->", user);
-  // const myUser = await User.findById(user._id);
-  // console.log("MY USER->", myUser);
+ 
 
   if (!myUser) {
     throw new ApiError(401, "User not logged in.");

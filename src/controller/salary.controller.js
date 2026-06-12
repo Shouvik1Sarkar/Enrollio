@@ -34,7 +34,7 @@ export const set_salary = asyncHandler(async (req, res) => {
     teacher = await Teacher.findOne({
       userId: get_user._id,
     });
-    // console.log("SALARY: ", teacher);
+
     logger.debug({ teacher }, "Salary");
     if (!teacher) {
       throw new ApiError(404, "Teacher not found.");
@@ -264,8 +264,6 @@ export const salary_history = asyncHandler(async (req, res) => {
     }
   });
 
-  //   console.log("SALARY HISTORY: ", salaryHistory);
-
   return res.status(200).json(
     new ApiResponse(
       200,
@@ -371,9 +369,6 @@ export const my_salary = asyncHandler(async (req, res) => {
     }
     // salary.push()
 
-    console.log("salary", teacher);
-
-    console.log("TEACHER SALARY -> ", teacher.salaryRecord);
     teacher.salaryRecord.map((f) => {
       salary.push(f);
     });

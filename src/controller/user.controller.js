@@ -14,7 +14,6 @@ import logger from "../utils/logger.utils.js";
 
 // *** GET USER *** \\
 export const getUser = asyncHandler(async (req, res) => {
-  // console.log("MY USER.");
   const myUser = req.user;
 
   if (!myUser) {
