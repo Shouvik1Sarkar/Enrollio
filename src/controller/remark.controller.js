@@ -3,6 +3,8 @@ import Student from "../models/student.models.js";
 import ApiError from "../utils/ApiError.utils.js";
 import ApiResponse from "../utils/ApiResponse.utils.js";
 import asyncHandler from "../utils/asyncHandler.utils.js";
+import { available_user_roles } from "../utils/constants.utils.js";
+import logger from "../utils/logger.utils.js";
 
 export const createRemarks = asyncHandler(async (req, res) => {
   const user = req.user;
@@ -60,28 +62,35 @@ export const createRemarks = asyncHandler(async (req, res) => {
 export const updateRemarks = asyncHandler(async (req, res) => {
   const user = req.user;
 
+  console.log("-----------------");
   if (!user) {
     throw new ApiError(401, "User not Logged In.");
   }
 
+  console.log("-----------------");
   if (user.role !== available_user_roles.TEACHER) {
     throw new ApiError(403, "Only teachers can update remarks.");
   }
 
+  console.log("-----------------");
   const { studentId, remarkId } = req.params;
   const { remark } = req.body;
+  console.log("-----------------");
 
   if (!remark || remark.trim() === "") {
     throw new ApiError(400, "Remark text is required.");
   }
 
   const student = await Student.findById(studentId).populate("enrolledBatches");
+  console.log("-----------------");
 
   if (!student) {
     throw new ApiError(404, "Student not found.");
   }
-
+  console.log("-----------------");
   const existingRemark = student.remarkHistory.id(remarkId);
+
+  console.log("existed -> ", existingRemark);
 
   if (!existingRemark) {
     throw new ApiError(404, "Remark not found.");
@@ -105,7 +114,6 @@ export const updateRemarks = asyncHandler(async (req, res) => {
 
 export const remarkById = asyncHandler(async (req, res) => {
   const user = req.user;
-
   if (!user) {
     throw new ApiError(401, "User not Logged In.");
   }
@@ -119,9 +127,17 @@ export const remarkById = asyncHandler(async (req, res) => {
     throw new ApiError(403, "Only teachers or admins can update remarks.");
   }
 
-  const { remarkId } = req.params;
+  const { studentId, remarkId } = req.params;
 
-  const remark = await Student.remarkHistory.id(remarkById);
+  const student = await Student.findById(studentId).populate(
+    "remarkHistory",
+    "batch month remark",
+  );
+  if (!student) {
+    throw new ApiError(404, "Student not found.");
+  }
+
+  const remark = student.remarkHistory.id(remarkId);
 
   if (!remark) {
     throw new ApiError(401, "remark not found.");

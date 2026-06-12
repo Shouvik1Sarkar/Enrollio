@@ -26,14 +26,14 @@ remarksRouter.post(
 );
 
 remarksRouter.patch(
-  "/create/:studentId/:remarkId",
+  "/:remarkId",
   logInAuth,
   authorizeRoles(teacher),
   updateRemarks,
 );
 
 remarksRouter.get(
-  "/create/:remarkId",
+  "/:remarkId/:studentId",
   logInAuth,
   authorizeRoles(admin, super_admin, teacher),
   remarkById,
