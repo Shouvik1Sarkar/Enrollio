@@ -6,6 +6,7 @@ import authorizeRoles from "../middleware/authorizeRoles.middleware.js";
 import { available_user_roles } from "../utils/constants.utils.js";
 import {
   createRemarks,
+  deleteRemarks,
   remarkById,
   updateRemarks,
 } from "../controller/remark.controller.js";
@@ -37,6 +38,12 @@ remarksRouter.get(
   logInAuth,
   authorizeRoles(admin, super_admin, teacher),
   remarkById,
+);
+remarksRouter.delete(
+  "/:remarkId/:studentId",
+  logInAuth,
+  authorizeRoles(admin, super_admin, teacher),
+  deleteRemarks,
 );
 
 export default remarksRouter;

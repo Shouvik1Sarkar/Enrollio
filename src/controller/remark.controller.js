@@ -13,6 +13,12 @@ export const createRemarks = asyncHandler(async (req, res) => {
   if (!user) {
     throw new ApiError(401, "User not Logged In.");
   }
+
+  const teacher = await Teacher.findOne({ userId: user._id });
+
+  if (!teacher) {
+    throw new ApiError(400, "Only teacher can create remark.");
+  }
   const now = new Date();
 
   const month = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
@@ -33,7 +39,10 @@ export const createRemarks = asyncHandler(async (req, res) => {
     throw new ApiError(404, "Batch not found.");
   }
 
-  if (batch.teacher !== user._id) {
+  console.log("BATCH TEACHER ", batch.teacher);
+  console.log("BATCH TEACHER ", teacher._id);
+
+  if (batch.teacher.toString() !== teacher._id.toString()) {
     throw new ApiError(400, "Only teacher of this batch can give review.");
   }
 
@@ -41,12 +50,13 @@ export const createRemarks = asyncHandler(async (req, res) => {
   const existed_remark = student.remarkHistory.find(
     (r) => r.batch.toString() === batchId && r.month === month,
   );
+
   if (existed_remark) {
     throw new ApiError(409, "Remark already exists for this batch and month.");
   }
 
   student.remarkHistory.push({
-    remarksBy: user._id,
+    remarksBy: teacher._id,
     remarksFor: student._id,
     batch: batch._id,
     month,
@@ -183,5 +193,5 @@ export const deleteRemarks = asyncHandler(async (req, res) => {
   student.remarkHistory.pull(remarkId);
   await student.save({ validateBeforeSave: false });
 
-  return res.status(200).json(new ApiResponse(200, remark, "Remark."));
+  return res.status(200).json(new ApiResponse(200, null, "Remark Deleted."));
 });
