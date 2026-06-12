@@ -21,12 +21,12 @@ const student = available_user_roles.STUDENT;
 remarksRouter.post(
   "/create/:studentId/:batchId",
   logInAuth,
-  authorizeRoles(admin, super_admin, teacher),
+  authorizeRoles(teacher),
   createRemarks,
 );
 
 remarksRouter.patch(
-  "/:remarkId",
+  "/:remarkId/:studentId",
   logInAuth,
   authorizeRoles(teacher),
   updateRemarks,
