@@ -1,4 +1,5 @@
 import Batch from "../models/batch.models.js";
+import Consultation from "../models/consultation.models.js";
 import Exam from "../models/exam.models.js";
 import Student from "../models/student.models.js";
 import ApiError from "../utils/ApiError.utils.js";
@@ -94,6 +95,7 @@ export const adminDashBoard = asyncHandler(async (req, res) => {
 
   /***************** Over Due Student *****************/
   let student_due = [];
+
   all_students.map((x) => {
     const r = x.feeHistory.map((a) => {
       if (a.status == "overdue") {
@@ -102,10 +104,21 @@ export const adminDashBoard = asyncHandler(async (req, res) => {
     });
   });
 
+  /*****************   *****************/
+
+  const consultations = await Consultation.find({
+    status: "pending",
+  });
+
+  const pending_consultation_counts = await consultations.length;
+
+  /***************** Row-2 *****************/
+
   const row_2 = {
     exams,
     total_exams,
     student_due,
+    pending_consultation_counts,
   };
 
   /********************** Result **********************/

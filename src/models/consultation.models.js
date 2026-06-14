@@ -8,26 +8,31 @@ const consultationSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
+
     phone: {
       type: String,
       required: true, // primary contact — more reliable than email
       trim: true,
     },
+
     email: {
       type: String,
       default: null,
       trim: true,
     },
+
     message: {
       type: String,
       default: null,
       trim: true,
     },
+
     status: {
       type: String,
       enum: ["pending", "contacted", "enrolled", "dropped"],
       default: "pending",
     },
+
     assignedTo: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User", // admin who follows up
