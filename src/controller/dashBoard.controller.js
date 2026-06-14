@@ -1,4 +1,5 @@
 import Batch from "../models/batch.models.js";
+import Exam from "../models/exam.models.js";
 import Student from "../models/student.models.js";
 import ApiError from "../utils/ApiError.utils.js";
 import ApiResponse from "../utils/ApiResponse.utils.js";
@@ -25,6 +26,9 @@ export const adminDashBoard = asyncHandler(async (req, res) => {
     const r = x.feeHistory.filter((a) => a.status == "pending");
     return r;
   });
+
+  console.log("PENDING ACCOUNTS ARRAY ===>", pending_accounts_array);
+
   const pending_amount = pending_accounts_array.flat(Infinity);
 
   console.log("PENDING AMOUNT => ", pending_amount.flat(Infinity));
@@ -42,7 +46,7 @@ export const adminDashBoard = asyncHandler(async (req, res) => {
   );
   console.log("=======> ", total_pending_amount);
 
-  /****************** TotalOver Due amount and pending fees ******************/
+  /****************** Total-Over Due amount and pending fees ******************/
   const overDue_accounts_array = all_students.map((x) => {
     const r = x.feeHistory.filter((a) => a.status == "overdue");
     return r;
@@ -64,7 +68,9 @@ export const adminDashBoard = asyncHandler(async (req, res) => {
   );
   console.log("=======> ", total_overDue_amount);
 
-  const result_1 = {
+  /****************** First Result ******************/
+
+  const row_1 = {
     total_batches: batch_number,
     total_students: student_numbers,
     pending_amount_count,
@@ -73,8 +79,40 @@ export const adminDashBoard = asyncHandler(async (req, res) => {
     total_overDue_amount,
   };
 
-  const result = { result_1 };
+  /****************** Upcoming Exams ******************/
 
+  const now = new Date();
+  const sevenDaysLater = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+
+  const exams = await Exam.find({
+    date: { $gte: now, $lte: sevenDaysLater },
+  })
+    .select("title date batch")
+    .populate("batch", "name")
+    .sort({ date: 1 });
+  const total_exams = exams.length;
+
+  /***************** Over Due Student *****************/
+  let student_due = [];
+  all_students.map((x) => {
+    const r = x.feeHistory.map((a) => {
+      if (a.status == "overdue") {
+        student_due.push(x);
+      }
+    });
+  });
+
+  const row_2 = {
+    exams,
+    total_exams,
+    student_due,
+  };
+
+  /********************** Result **********************/
+
+  const result = { row_1, row_2 };
+
+  /****************************************************/
   return res
     .status(200)
     .json(new ApiResponse(200, result, "ADMIN DASH BOARD."));
