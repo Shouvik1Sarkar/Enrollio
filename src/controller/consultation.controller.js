@@ -3,7 +3,7 @@ import ApiError from "../utils/ApiError.utils.js";
 import ApiResponse from "../utils/ApiResponse.utils.js";
 import asyncHandler from "../utils/asyncHandler.utils.js";
 
-// *** BOOK CONSULTATION *** \\
+/ *** BOOK CONSULTATION *** /;
 
 export const bookConsultation = asyncHandler(async (req, res) => {
   const { name, phone, email, message } = req.body;
@@ -43,7 +43,7 @@ export const bookConsultation = asyncHandler(async (req, res) => {
     .json(new ApiResponse(201, createConsultation, "Consultation created."));
 });
 
-// *** GET ALL CONSULTATION *** \\
+/ *** GET ALL CONSULTATION *** /;
 
 export const getAllaConsultation = asyncHandler(async (req, res) => {
   const user = req.user;
@@ -63,7 +63,7 @@ export const getAllaConsultation = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, all_consultations, "All consultations."));
 });
 
-// *** DELETE CONSULTATION *** \\
+/ *** DELETE CONSULTATION *** /;
 
 export const deleteConsultation = asyncHandler(async (req, res) => {
   const user = req.user;
@@ -85,7 +85,7 @@ export const deleteConsultation = asyncHandler(async (req, res) => {
   return res.status(200).json(new ApiResponse(200, null, "Deleted."));
 });
 
-// *** MARK CONSULTATION *** \\
+/ *** MARK CONSULTATION *** /;
 
 export const markConsultation = asyncHandler(async (req, res) => {
   const user = req.user;
@@ -119,7 +119,7 @@ export const markConsultation = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, consultation, "Consultation status updated."));
 });
 
-// *** GET CONSULTATIONS BY ID *** \\
+/ *** GET CONSULTATIONS BY ID *** /;
 
 export const getConsultationById = asyncHandler(async (req, res) => {
   const user = req.user;
