@@ -4,7 +4,7 @@ import ApiError from "../utils/ApiError.utils.js";
 import ApiResponse from "../utils/ApiResponse.utils.js";
 import asyncHandler from "../utils/asyncHandler.utils.js";
 
-/ *** SET UP ADMIN  *** /;
+// *** SET UP ADMIN  *** \\
 
 export const setUpAdmin = asyncHandler(async (req, res) => {
   const user = req.user;
@@ -38,7 +38,7 @@ export const setUpAdmin = asyncHandler(async (req, res) => {
   return res.status(200).json(new ApiResponse(200, admin, "Admin Created."));
 });
 
-/ *** SET UP ADMIN SALARY *** /;
+// *** SET UP ADMIN SALARY *** \\
 
 export const setUpAdminSalary = asyncHandler(async (req, res) => {
   const user = req.user;
@@ -66,7 +66,7 @@ export const setUpAdminSalary = asyncHandler(async (req, res) => {
   return res.status(200).json(new ApiResponse(200, getAdmin, "Admin Created."));
 });
 
-/ *** ALL ADMINS *** /;
+// *** ALL ADMINS *** \\
 
 export const setUpAdminSalary = asyncHandler(async (req, res) => {
   const user = req.user;
@@ -83,7 +83,7 @@ export const setUpAdminSalary = asyncHandler(async (req, res) => {
   return res.status(200).json(new ApiResponse(200, allAdmins, "All Admins."));
 });
 
-/ *** DELETE ADMIN *** /;
+// *** DELETE ADMIN *** \\
 
 export const deleteAdmin = asyncHandler(async (req, res) => {
   const user = req.user;
@@ -109,7 +109,7 @@ export const deleteAdmin = asyncHandler(async (req, res) => {
   return res.status(200).json(new ApiResponse(200, null, "Admin deleted."));
 });
 
-/ *** GET ADMIN BY ID *** /;
+// *** GET ADMIN BY ID *** \\
 
 export const getAdminById = asyncHandler(async (req, res) => {
   const user = req.user;

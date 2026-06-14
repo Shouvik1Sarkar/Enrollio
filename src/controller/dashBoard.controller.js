@@ -6,7 +6,7 @@ import ApiError from "../utils/ApiError.utils.js";
 import ApiResponse from "../utils/ApiResponse.utils.js";
 import asyncHandler from "../utils/asyncHandler.utils.js";
 
-/ *** Admin DashBoard *** /;
+// *** Admin DashBoard *** \\;
 
 export const adminDashBoard = asyncHandler(async (req, res) => {
   const user = req.user;
