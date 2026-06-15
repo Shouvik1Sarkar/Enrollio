@@ -15,6 +15,11 @@ export const adminDashBoard = asyncHandler(async (req, res) => {
   if (!user) {
     throw new ApiError(401, "User Not Logged In.");
   }
+
+  if (!["super_admin", "admin"].includes(user.role)) {
+    throw new ApiError(403, "Only admins can view the dashboard.");
+  }
+
   /****************** Number of Batches ******************/
   const allBatches = await Batch.find();
 
@@ -129,10 +134,21 @@ export const adminDashBoard = asyncHandler(async (req, res) => {
     status: "pending",
   }).populate("user", "name userName email");
 
+  /********************** New Enrollments **********************/
+
+  const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+
+  const new_enrollments = await Student.find({
+    createdAt: { $gte: sevenDaysAgo },
+  })
+    .select("userId studentType createdAt")
+    .populate("userId", "name userName email role");
+
   /***************** Row-3 *****************/
 
   const row_3 = {
     pending_salary: salary,
+    new_enrollments,
   };
 
   /********************** Result **********************/
