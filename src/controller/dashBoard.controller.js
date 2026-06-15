@@ -1,6 +1,7 @@
 import Batch from "../models/batch.models.js";
 import Consultation from "../models/consultation.models.js";
 import Exam from "../models/exam.models.js";
+import Salary from "../models/salary.models.js";
 import Student from "../models/student.models.js";
 import ApiError from "../utils/ApiError.utils.js";
 import ApiResponse from "../utils/ApiResponse.utils.js";
@@ -106,7 +107,7 @@ export const adminDashBoard = asyncHandler(async (req, res) => {
     });
   });
 
-  /*****************   *****************/
+  /***************** Consultation *****************/
 
   const consultations = await Consultation.find({
     status: "pending",
@@ -122,10 +123,21 @@ export const adminDashBoard = asyncHandler(async (req, res) => {
     student_due,
     pending_consultation_counts,
   };
+  /***************** Salary *****************/
+
+  const salary = await Salary.find({
+    status: "pending",
+  }).populate("user", "name userName email");
+
+  /***************** Row-2 *****************/
+
+  const row_3 = {
+    pending_salary: salary,
+  };
 
   /********************** Result **********************/
 
-  const result = { row_1, row_2 };
+  const result = { row_1, row_2, row_3 };
 
   /****************************************************/
   return res
