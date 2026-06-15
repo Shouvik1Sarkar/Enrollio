@@ -150,6 +150,7 @@ export const addSingleFeeRecord = asyncHandler(async (req, res) => {
 
 export const feeById = asyncHandler(async (req, res) => {
   const user = req.user;
+
   if (!user) {
     throw new ApiError(401, "User not logged in.");
   }
@@ -160,6 +161,7 @@ export const feeById = asyncHandler(async (req, res) => {
     "feeHistory.batch",
     "name monthlyFees",
   );
+
   if (!student) {
     throw new ApiError(404, "Student not found.");
   }
@@ -271,6 +273,7 @@ export const getStudentFeeHistory = asyncHandler(async (req, res) => {
     path: "feeHistory.batch",
     select: "name",
   });
+
   if (!student) {
     throw new ApiError(404, "Student not found");
   }
