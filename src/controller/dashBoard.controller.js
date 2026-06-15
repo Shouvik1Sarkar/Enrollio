@@ -129,7 +129,7 @@ export const adminDashBoard = asyncHandler(async (req, res) => {
     status: "pending",
   }).populate("user", "name userName email");
 
-  /***************** Row-2 *****************/
+  /***************** Row-3 *****************/
 
   const row_3 = {
     pending_salary: salary,
