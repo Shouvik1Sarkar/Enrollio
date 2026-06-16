@@ -108,6 +108,8 @@ export const adminDashBoard = asyncHandler(async (req, res) => {
     status: "pending",
   });
 
+  console.log("******************************", consultations);
+
   const pending_consultation_counts = await consultations.length;
 
   /***************** Row-2 *****************/

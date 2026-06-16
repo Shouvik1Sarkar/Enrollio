@@ -38,6 +38,7 @@ studentRouter.post(
   authorizeRoles(admin, super_admin, teacher),
   setupStudentProfile,
 );
+
 // creates the Student doc linked to an existing User
 
 // *** GET ALL STUDENTS *** \\
@@ -47,10 +48,12 @@ studentRouter.get(
   authorizeRoles(admin, super_admin, teacher),
   getAllStudents,
 );
+
 // // admin sees all students, with filters
 
 // *** GET STUDENTS BY ID *** \\
 studentRouter.get("/:student_id", logInAuth, getStudentById);
+
 // // full profile + enrolled batches populated
 
 // *** UPDATE STUDENT PROFILE *** \\

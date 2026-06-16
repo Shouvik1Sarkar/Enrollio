@@ -24,24 +24,28 @@ authRouter.post(
   authorizeRoles(super_admin, admin),
   setUpAdmin,
 );
+
 authRouter.patch(
   "/set-salary/:admin_id",
   logInAuth,
   authorizeRoles(super_admin, admin),
   setUpAdminSalary,
 );
+
 authRouter.get(
   "/all",
   logInAuth,
   authorizeRoles(super_admin, admin),
   setUpAdminSalary,
 );
+
 authRouter.delete(
   "/:admin_id",
   logInAuth,
   authorizeRoles(super_admin),
   deleteAdmin,
 );
+
 authRouter.get(
   "/:admin_id",
   logInAuth,
