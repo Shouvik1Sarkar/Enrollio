@@ -36,24 +36,18 @@ export const adminDashBoard = asyncHandler(async (req, res) => {
     return r;
   });
 
-  // console.log("PENDING ACCOUNTS ARRAY ===>", pending_accounts_array);
-
   const pending_amount = pending_accounts_array.flat(Infinity);
-
-  // console.log("PENDING AMOUNT => ", pending_amount.flat(Infinity));
 
   const pending_amount_count = pending_amount.length;
 
   const total_pending_amount_array = pending_amount.map((s) => {
     return s.amount;
   });
-  // console.log("=======> ", total_pending_amount_array);
 
   const total_pending_amount = total_pending_amount_array.reduce(
     (acc, num) => acc + num,
     0,
   );
-  // console.log("=======> ", total_pending_amount);
 
   /****************** Total-Over Due amount and pending fees ******************/
   const overDue_accounts_array = all_students.map((x) => {
@@ -62,20 +56,16 @@ export const adminDashBoard = asyncHandler(async (req, res) => {
   });
   const overDue_amount = overDue_accounts_array.flat(Infinity);
 
-  // console.log("OVER-DUE AMOUNT => ", pending_amount.flat(Infinity));
-
   const overDue_amount_count = overDue_amount.length;
 
   const total_overDue_amount_array = overDue_amount.map((s) => {
     return s.amount;
   });
-  // console.log("=======> ", total_overDue_amount_array);
 
   const total_overDue_amount = total_overDue_amount_array.reduce(
     (acc, num) => acc + num,
     0,
   );
-  // console.log("=======> ", total_overDue_amount);
 
   /****************** First Result ******************/
 
